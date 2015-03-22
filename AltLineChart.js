@@ -60,10 +60,77 @@
 
 		//},
 
+		calculateRange: function() {
+
+			var xmin = undefined,
+				xmax = undefined,
+				ymin = undefined,
+				ymax = undefined;
+
+			for (var i = 0; i < this.datasets.length; i++) {
+
+				var ds = this.datasets[i];
+
+				for (var j = 0; j < ds.data.length; j++) {
+
+					var value = ds.data[j];
+
+					// min x
+					if (xmin === undefined || value.x < xmin) {
+						xmin = value.x;
+					}
+
+					// max x
+					if (xmax === undefined || value.x > xmax) {
+						xmax = value.x;
+					}
+
+					// min y
+					if (ymin === undefined || value.y < ymin) {
+						ymin = value.y;
+					}
+
+					// max y
+					if (ymax === undefined || value.y > ymax) {
+						ymax = value.y;
+					}
+				}
+			}
+
+			return {
+				xmin : xmin, 
+				xmax : xmax, 
+				ymin: ymin, 
+				ymax: ymax
+			}
+		},
+
+		initCalculator: function (ease) {
+
+			var easingDecimal = ease || 1,
+				range = this.calculateRange(),
+				width = this.chart.width,
+				height = this.chart.height;
+
+			return {
+				calculateX : function(x) {
+
+					return (x - range.xmin) * width / (range.xmax - range.xmin);
+				},
+				calculateY : function(y) {
+					
+					return height - ((y - range.ymin) * height / (range.ymax - range.ymin)) * easingDecimal;
+				}
+			};
+		},
+
 		// Used to draw something on the canvas
 		draw: function (ease) {
 
-			var easingDecimal = ease || 1;
+
+
+			var calc = this.initCalculator(ease);
+
 			this.clear();
 
 			helpers.each(this.datasets, function (dataset) {
@@ -74,11 +141,14 @@
 
 				helpers.each(dataset.data, function (point, index) {
 
+					var xpos = calc.calculateX(point.x);
+					var ypos = calc.calculateY(point.y);
+
 					if (index === 0) {
-						ctx.moveTo(point.x, point.y * easingDecimal);
+						ctx.moveTo(xpos, ypos);
 					}
 					else {
-						ctx.lineTo(point.x, point.y * easingDecimal);
+						ctx.lineTo(xpos, ypos);
 					}
 
 				}, this);
