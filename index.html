@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+
+	<title>title</title>
+	<script src="Chart.js"></script>
+	<script src="AltLineChart.js"></script>
+</head>
+<body>
+	<canvas id="myChart" width="400" height="400" style="border: 1px solid greenyellow;"></canvas>
+
+	<script>
+
+		var data = [
+			{
+				strokeColor: '#F16220',
+				data: [
+					{ x: 19, y: 65 }, { x: 27, y: 59 }, { x: 28, y: 80 }, { x: 40, y: 81 },
+					{ x: 48, y: 56 }, { x: 86, y: 55 }, { x: 90, y: 40 }
+				]
+			},
+			{
+				strokeColor: '#007ACC',
+				data: [
+					{ x: 19, y: 75 }, { x: 27, y: 69 }, { x: 28, y: 70 }, { x: 40, y: 31 },
+					{ x: 48, y: 76 }, { x: 86, y: 45 }, { x: 90, y: 50 }
+				]
+			}
+		];
+
+
+		Chart.defaults.global.responsive = true;
+		var ctx = document.getElementById("myChart").getContext("2d");
+		var myLineChart = new Chart(ctx).AltLineChart(data);
+
+	</script>
+</body>
+</html>
