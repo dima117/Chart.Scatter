@@ -36,7 +36,7 @@
 		name: "AltLineChart",
 		defaults: defaultConfig,
 
-		initialize: function (datasets) {
+		initialize: function(datasets) {
 
 			//this.chart.ctx // The drawing context for this chart
 			//this.chart.canvas // the canvas node for this chart
@@ -98,28 +98,123 @@
 			}
 
 			return {
-				xmin : xmin, 
-				xmax : xmax, 
-				ymin: ymin, 
+				xmin: xmin,
+				xmax: xmax,
+				ymin: ymin,
 				ymax: ymax
 			}
 		},
 
-		initCalculator: function (ease) {
+		initCalculator: function(ease, options) {
 
 			var easingDecimal = ease || 1,
 				range = this.calculateRange(),
 				width = this.chart.width,
 				height = this.chart.height;
 
+			var api = {
+				getElementOrDefault: function(array, index, defaultValue) {
+
+					return index >= 0 && index < array.length
+						? array[index]
+						: defaultValue;
+				},
+				calculateDisplayPoint: function(prev, current, next, tension) {
+					
+					return {
+						inner: { x: current.x - 5, y: current.y },
+						outer: { x: current.x + 5, y: current.y }
+					}
+				}
+			};
+
 			return {
-				calculateX : function(x) {
+				calculateX: function(x) {
 
 					return (x - range.xmin) * width / (range.xmax - range.xmin);
 				},
-				calculateY : function(y) {
-					
+				calculateY: function(y) {
+
 					return height - ((y - range.ymin) * height / (range.ymax - range.ymin)) * easingDecimal;
+				},
+
+				calculatePointPositions: function(data) {
+
+					var result = [];
+
+					for (var i = 0; i < data.length; i++) {
+
+						var current = api.getElementOrDefault(data, i);
+
+						var point = {
+							x: this.calculateX(current.x),
+							y: this.calculateY(current.y)
+						};
+
+						if (options.bezierCurve) {
+
+							var prev = api.getElementOrDefault(data, i - 1);
+							var next = api.getElementOrDefault(data, i + 1);
+
+							var obj = api.calculateDisplayPoint(prev, current, next, options.bezierCurveTension);
+
+							point.x1 = this.calculateX(obj.inner.x);
+							point.y1 = this.calculateY(obj.inner.y);
+
+							point.x2 = this.calculateX(obj.outer.x);
+							point.y2 = this.calculateY(obj.outer.y);
+						}
+
+						result.push(point);
+					}
+
+					return result;
+				},
+
+				calculateControlPoints: function (prev, current, next, bezierCurveTension) {
+
+					var tension = (!!prev && !!next) ? bezierCurveTension : 0;
+					var innerPrev = prev || current;
+					var innerNext = next || current;
+
+
+					var a = { xx: current.x - innerPrev.x, yy: current.x - innerPrev.x }
+					var b = { xx: innerNext.x - innerPrev.x, yy: innerNext.x - innerPrev.x }
+
+					var mul = a.xx * b.xx + a.yy * b.yy;
+					var mod = Math.sqrt(b.xx * b.xx + b.yy * b.yy);
+
+					var k = mul / (mod * mod);
+
+					var controlPoints = helpers.splineCurve(prev || current, current, next || current, tension);
+
+					// Prevent the bezier going outside of the bounds of the graph
+
+					// Cap puter bezier handles to the upper/lower scale bounds
+					if (controlPoints.outer.y > range.ymax) {
+
+						controlPoints.outer.y = range.ymax;
+					} else {
+
+						if (controlPoints.outer.y < range.ymin) {
+
+							controlPoints.outer.y = range.ymin;
+						}
+					}
+
+					// Cap inner bezier handles to the upper/lower scale bounds
+					if (controlPoints.inner.y > range.ymax) {
+
+						controlPoints.inner.y = range.ymax;
+					} else {
+
+						if (controlPoints.inner.y < range.ymin) {
+
+							controlPoints.inner.y = range.ymin;
+						}
+					}
+
+					return controlPoints;
 				}
 			};
 		},
@@ -127,9 +222,7 @@
 		// Used to draw something on the canvas
 		draw: function (ease) {
 
-
-
-			var calc = this.initCalculator(ease);
+			var calc = this.initCalculator(ease, this.options);
 
 			this.clear();
 
@@ -139,16 +232,26 @@
 				ctx.strokeStyle = dataset.strokeColor;
 				ctx.beginPath();
 
-				helpers.each(dataset.data, function (point, index) {
+				var points = calc.calculatePointPositions(dataset.data);
+				var prev = points[0];
 
-					var xpos = calc.calculateX(point.x);
-					var ypos = calc.calculateY(point.y);
+				helpers.each(points, function (point, index) {
 
 					if (index === 0) {
-						ctx.moveTo(xpos, ypos);
+
+						ctx.moveTo(point.x, point.y);
 					}
 					else {
-						ctx.lineTo(xpos, ypos);
+
+						if (this.options.bezierCurve) {
+
+							ctx.bezierCurveTo(prev.x2, prev.y2, point.x1, point.y1, point.x, point.y);
+							prev = point;
+						}
+						else {
+
+							ctx.lineTo(point.x, point.y);
+						}
 					}
 
 				}, this);
