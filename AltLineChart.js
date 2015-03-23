@@ -35,7 +35,7 @@
 		name: "AltLineChart",
 		defaults: defaultConfig,
 
-		initialize: function(datasets) {
+		initialize: function (datasets) {
 
 			//this.chart.ctx // The drawing context for this chart
 			//this.chart.canvas // the canvas node for this chart
@@ -60,7 +60,7 @@
 
 		//},
 
-		calculateRange: function() {
+		calculateRange: function () {
 
 			var xmin = undefined,
 				xmax = undefined,
@@ -105,7 +105,7 @@
 			}
 		},
 
-		initCalculator: function(ease, options) {
+		initCalculator: function (ease, options) {
 
 			var easingDecimal = ease || 1,
 				range = this.calculateRange(),
@@ -113,14 +113,14 @@
 				height = this.chart.height;
 
 			var api = {
-				getElementOrDefault: function(array, index, defaultValue) {
+				getElementOrDefault: function (array, index, defaultValue) {
 
 					return index >= 0 && index < array.length
 						? array[index]
 						: defaultValue;
 				},
-				calculateControlPoints: function(prev, current, next, tension) {
-					
+				calculateControlPoints: function (prev, current, next, tension) {
+
 					var tensionBefore = !!prev ? tension : 0;
 					var tensionAfter = !!next ? tension : 0;
 
@@ -133,7 +133,7 @@
 					var mul = a.xx * b.xx + a.yy * b.yy;
 					var mod = Math.sqrt(b.xx * b.xx + b.yy * b.yy);
 
-					var k = mul / (mod * mod);
+					var k = Math.min(Math.max(mul / (mod * mod), 0.3), 0.7);
 
 					var result = {
 						before: { x: current.x - b.xx * k * tensionBefore, y: current.y - b.yy * k * tensionBefore },
@@ -168,16 +168,16 @@
 			};
 
 			return {
-				calculateX: function(x) {
+				calculateX: function (x) {
 
 					return (x - range.xmin) * width / (range.xmax - range.xmin);
 				},
-				calculateY: function(y) {
+				calculateY: function (y) {
 
 					return height - ((y - range.ymin) * height / (range.ymax - range.ymin)) * easingDecimal;
 				},
 
-				calculatePointPositions: function(data) {
+				calculatePointPositions: function (data) {
 
 					var result = [];
 
@@ -252,11 +252,9 @@
 				ctx.stroke();
 
 				// debug
-
 				ctx.lineWidth = 1;
-				ctx.strokeStyle = '#4DB849';
-				ctx.fillStyle = '#5994CE';
-				
+				ctx.strokeStyle = '#C5D6E0';
+
 				if (this.options.bezierCurve) {
 
 					helpers.each(points, function(point, index) {
@@ -265,15 +263,21 @@
 						ctx.moveTo(point.x1, point.y1);
 						ctx.lineTo(point.x2, point.y2);
 						ctx.stroke();
-
-						ctx.beginPath();
-						ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI, false);
-						ctx.fill();
-						ctx.stroke();
 					});
 				}
-
 				
+				// points
+				ctx.lineWidth = 1;
+				ctx.strokeStyle = 'white';
+				ctx.fillStyle = dataset.strokeColor;
+
+				helpers.each(points, function (point) {
+
+					ctx.beginPath();
+					ctx.arc(point.x, point.y, 4, 0, 2 * Math.PI, false);
+					ctx.fill();
+					ctx.stroke();
+				});
 
 			}, this);
 

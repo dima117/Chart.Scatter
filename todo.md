@@ -1,6 +1,6 @@
 #todo
 
-1. bezier curves
+1. ~~bezier curves~~
 2. points
 3. hover state &  tooltip
 4. scale
