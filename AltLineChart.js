@@ -1,9 +1,8 @@
 ﻿(function () {
 	"use strict";
 
-	var root = this,
-		chartjs = root.Chart,
-		helpers = Chart.helpers;
+	var chartjs = this,
+		helpers = chartjs.helpers;
 
 	var defaultConfig = {
 
@@ -55,7 +54,7 @@
 		//		height: this.chart.height,
 		//		width: this.chart.width,
 		//		ctx: this.chart.ctx
-		//	};
+		//	}; 
 
 		//	var scale = new chartjs.AltScale(scaleOptions);
 
@@ -120,12 +119,51 @@
 						? array[index]
 						: defaultValue;
 				},
-				calculateDisplayPoint: function(prev, current, next, tension) {
+				calculateControlPoints: function(prev, current, next, tension) {
 					
-					return {
-						inner: { x: current.x - 5, y: current.y },
-						outer: { x: current.x + 5, y: current.y }
+					var tensionBefore = !!prev ? tension : 0;
+					var tensionAfter = !!next ? tension : 0;
+
+					var innerPrev = prev || current;
+					var innerNext = next || current;
+
+					var a = { xx: current.x - innerPrev.x, yy: current.y - innerPrev.y }
+					var b = { xx: innerNext.x - innerPrev.x, yy: innerNext.y - innerPrev.y }
+
+					var mul = a.xx * b.xx + a.yy * b.yy;
+					var mod = Math.sqrt(b.xx * b.xx + b.yy * b.yy);
+
+					var k = mul / (mod * mod);
+
+					var result = {
+						before: { x: current.x - b.xx * k * tensionBefore, y: current.y - b.yy * k * tensionBefore },
+						after: { x: current.x + b.xx * (1 - k) * tensionAfter, y: current.y + b.yy * (1 - k) * tensionAfter }
+					};
+
+					if (result.after.y > range.ymax) {
+
+						result.after.y = range.ymax;
+					} else {
+
+						if (result.after.y < range.ymin) {
+
+							result.after.y = range.ymin;
+						}
 					}
+
+					// Cap inner bezier handles to the upper/lower scale bounds
+					if (result.before.y > range.ymax) {
+
+						result.before.y = range.ymax;
+					} else {
+
+						if (result.before.y < range.ymin) {
+
+							result.before.y = range.ymin;
+						}
+					}
+
+					return result;
 				}
 			};
 
@@ -157,65 +195,19 @@
 							var prev = api.getElementOrDefault(data, i - 1);
 							var next = api.getElementOrDefault(data, i + 1);
 
-							var obj = api.calculateDisplayPoint(prev, current, next, options.bezierCurveTension);
+							var obj = api.calculateControlPoints(prev, current, next, options.bezierCurveTension);
 
-							point.x1 = this.calculateX(obj.inner.x);
-							point.y1 = this.calculateY(obj.inner.y);
+							point.x1 = this.calculateX(obj.before.x);
+							point.y1 = this.calculateY(obj.before.y);
 
-							point.x2 = this.calculateX(obj.outer.x);
-							point.y2 = this.calculateY(obj.outer.y);
+							point.x2 = this.calculateX(obj.after.x);
+							point.y2 = this.calculateY(obj.after.y);
 						}
 
 						result.push(point);
 					}
 
 					return result;
-				},
-
-				calculateControlPoints: function (prev, current, next, bezierCurveTension) {
-
-					var tension = (!!prev && !!next) ? bezierCurveTension : 0;
-					var innerPrev = prev || current;
-					var innerNext = next || current;
-
-
-					var a = { xx: current.x - innerPrev.x, yy: current.x - innerPrev.x }
-					var b = { xx: innerNext.x - innerPrev.x, yy: innerNext.x - innerPrev.x }
-
-					var mul = a.xx * b.xx + a.yy * b.yy;
-					var mod = Math.sqrt(b.xx * b.xx + b.yy * b.yy);
-
-					var k = mul / (mod * mod);
-
-					var controlPoints = helpers.splineCurve(prev || current, current, next || current, tension);
-
-					// Prevent the bezier going outside of the bounds of the graph
-
-					// Cap puter bezier handles to the upper/lower scale bounds
-					if (controlPoints.outer.y > range.ymax) {
-
-						controlPoints.outer.y = range.ymax;
-					} else {
-
-						if (controlPoints.outer.y < range.ymin) {
-
-							controlPoints.outer.y = range.ymin;
-						}
-					}
-
-					// Cap inner bezier handles to the upper/lower scale bounds
-					if (controlPoints.inner.y > range.ymax) {
-
-						controlPoints.inner.y = range.ymax;
-					} else {
-
-						if (controlPoints.inner.y < range.ymin) {
-
-							controlPoints.inner.y = range.ymin;
-						}
-					}
-
-					return controlPoints;
 				}
 			};
 		},
@@ -229,7 +221,7 @@
 
 			helpers.each(this.datasets, function (dataset) {
 
-				ctx.lineWidth = 2;//this.options.datasetStrokeWidth;
+				ctx.lineWidth = this.options.datasetStrokeWidth;
 				ctx.strokeStyle = dataset.strokeColor;
 				ctx.beginPath();
 
@@ -259,9 +251,33 @@
 
 				ctx.stroke();
 
+				// debug
+
+				ctx.lineWidth = 1;
+				ctx.strokeStyle = '#4DB849';
+				ctx.fillStyle = '#5994CE';
+				
+				if (this.options.bezierCurve) {
+
+					helpers.each(points, function(point, index) {
+
+						ctx.beginPath();
+						ctx.moveTo(point.x1, point.y1);
+						ctx.lineTo(point.x2, point.y2);
+						ctx.stroke();
+
+						ctx.beginPath();
+						ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI, false);
+						ctx.fill();
+						ctx.stroke();
+					});
+				}
+
+				
+
 			}, this);
 
 		}
 	});
 
-}).call(window);
+}).call(window.Chart);
