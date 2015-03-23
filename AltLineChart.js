@@ -43,6 +43,7 @@
 
 			this.datasets = datasets;
 
+			this.render();
 			//this.scale = this.buildScale(options.data)
 		},
 
