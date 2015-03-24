@@ -164,6 +164,26 @@
 					}
 
 					return result;
+				},
+				calculateScaleParameters: function (min, max) {
+
+					var x = [0.01, 0.1, 1, 10, 100, 1000, 10000];
+
+					var range = max - min;
+					var mul = 0.0001;
+					while (range / mul > 14) {
+
+						mul *= 10;
+					}
+
+					var start = (Math.trunc(min / mul) + 1) * mul;
+					var end = Math.trunc(max / mul) * mul;
+
+					return {
+						start: start,
+						end: end,
+						step: mul
+					};
 				}
 			};
 
@@ -208,6 +228,15 @@
 					}
 
 					return result;
+				},
+
+				calculateXScaleParameters: function() {
+
+					return api.calculateScaleParameters(range.xmin, range.xmax);
+				},
+				calculateYScaleParameters: function() {
+
+					return api.calculateScaleParameters(range.ymin, range.ymax);
 				}
 			};
 		},
@@ -218,6 +247,30 @@
 			var calc = this.initCalculator(ease, this.options);
 
 			this.clear();
+
+			// axis
+			ctx.strokeStyle = '#eeeeee';
+
+			//var scaleX = calc.calculateXScaleParameters();
+			//for (var i = scaleX.start; i <= scaleX.end; i += scaleX.step) {
+
+			//	var xpos1 = calc.calculateX(i);
+			//	ctx.beginPath();
+			//	ctx.moveTo(xpos1, 0);
+			//	ctx.lineTo(xpos1, this.chart.height);
+			//	ctx.stroke();
+			//}
+
+			var scaleY = calc.calculateXScaleParameters();
+			for (var j = scaleY.start; j <= scaleY.end; j += scaleY.step) {
+
+				var ypos1 = calc.calculateY(j);
+				ctx.beginPath();
+				ctx.moveTo(0, ypos1);
+				ctx.lineTo(this.chart.width, ypos1);
+				ctx.stroke();
+			}
+
 
 			helpers.each(this.datasets, function (dataset) {
 
@@ -257,7 +310,7 @@
 
 				if (this.options.bezierCurve) {
 
-					helpers.each(points, function(point, index) {
+					helpers.each(points, function (point, index) {
 
 						ctx.beginPath();
 						ctx.moveTo(point.x1, point.y1);
@@ -265,7 +318,7 @@
 						ctx.stroke();
 					});
 				}
-				
+
 				// points
 				ctx.lineWidth = 1;
 				ctx.strokeStyle = 'white';
@@ -278,6 +331,8 @@
 					ctx.fill();
 					ctx.stroke();
 				});
+
+
 
 			}, this);
 
