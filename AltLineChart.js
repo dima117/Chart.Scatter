@@ -21,8 +21,11 @@
 		pointDot: true,					// Boolean - Whether to show a dot for each point
 		pointDotStrokeWidth: 1,			// Number - Pixel width of point dot stroke
 		pointDotRadius: 4,				// Number - Radius of each point dot in pixels
-		pointHitDetectionRadius: 20,	// Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+		pointHitDetectionRadius: 5,		// Number - amount extra to add to the radius to cater for hit detection outside the drawn point
 
+
+		
+		tooltipTemplate: "<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%= value.y %>",
 		
 		x: 1
 		
@@ -75,7 +78,75 @@
 
 			}, this);
 
+			//Set up tooltip events on the chart
+			if (this.options.showTooltips) {
+
+				helpers.bindEvents(this, this.options.tooltipEvents, function (evt) {
+
+					var activePoints = (evt.type !== 'mouseout') ? this.getPointsAtEvent(evt) : [];
+
+					helpers.each(this.datasets, function (dataset) {
+
+						helpers.each(dataset.points, function (point) {
+
+							point.restore(['fillColor', 'strokeColor']);
+						});
+					});
+
+					helpers.each(activePoints, function (activePoint) {
+						activePoint.fillColor = activePoint.highlightFill;
+						activePoint.strokeColor = activePoint.highlightStroke;
+					});
+
+					this.showTooltip(activePoints);
+				});
+			}
+
 			this.render();
+		},
+
+		// helpers
+		getPointsAtEvent: function (e) {
+			var pointsArray = [],
+				eventPosition = helpers.getRelativePosition(e);
+			helpers.each(this.datasets, function (dataset) {
+				helpers.each(dataset.points, function (point) {
+					if (point.inRange(eventPosition.x, eventPosition.y)) pointsArray.push(point);
+				});
+			}, this);
+			return pointsArray;
+		},
+
+		showTooltip: function(elements) {
+
+			this.draw();
+
+			if (elements.length > 0) {
+
+				helpers.each(elements, function (element) {
+
+					var tooltipPosition = element.tooltipPosition();
+
+					new chartjs.Tooltip({
+						x: Math.round(tooltipPosition.x),
+						y: Math.round(tooltipPosition.y),
+						xPadding: this.options.tooltipXPadding,
+						yPadding: this.options.tooltipYPadding,
+						fillColor: this.options.tooltipFillColor,
+						textColor: this.options.tooltipFontColor,
+						fontFamily: this.options.tooltipFontFamily,
+						fontStyle: this.options.tooltipFontStyle,
+						fontSize: this.options.tooltipFontSize,
+						caretHeight: this.options.tooltipCaretSize,
+						cornerRadius: this.options.tooltipCornerRadius,
+						text: helpers.template(this.options.tooltipTemplate, element),
+						chart: this.chart,
+						custom: this.options.customTooltips
+					}).draw();
+				}, this);
+	
+			}
+			return this;
 		},
 
 		calculateRange: function () {
@@ -129,6 +200,9 @@
 				height = this.chart.height;
 
 			var api = {
+				trunc: function(x) {
+					return x < 0 ? Math.ceil(x) : Math.floor(x);
+				},
 				getElementOrDefault: function (array, index, defaultValue) {
 
 					return index >= 0 && index < array.length
@@ -191,8 +265,8 @@
 						step *= 10;
 					}
 
-					var pos = (Math.trunc(min / step) + 1) * step;
-					var end = Math.trunc(max / step) * step;
+					var pos = (api.trunc(min / step) + 1) * step;
+					var end = api.trunc(max / step) * step;
 
 					var a = [];
 					while (pos <= end) {
