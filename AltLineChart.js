@@ -6,29 +6,26 @@
 
 	var defaultConfig = {
 
-		//Boolean - Whether the line is curved between points
-		bezierCurve: true,
+		
+		// LINES
 
-		//Number - Tension of the bezier curve between points
-		bezierCurveTension: 0.4,
+		datasetStroke: true,			// Boolean - Whether to show a stroke for datasets
+		datasetStrokeWidth: 2,			// Number - Pixel width of dataset stroke
 
-		//Boolean - Whether to show a dot for each point
-		pointDot: true,
+		bezierCurve: true,				// Boolean - Whether the line is curved between points
+		bezierCurveTension: 0.4,		// Number - Tension of the bezier curve between points
 
-		//Number - Radius of each point dot in pixels
-		pointDotRadius: 4,
 
-		//Number - Pixel width of point dot stroke
-		pointDotStrokeWidth: 1,
 
-		//Number - amount extra to add to the radius to cater for hit detection outside the drawn point
-		pointHitDetectionRadius: 20,
+		// POINTS
+		pointDot: true,					// Boolean - Whether to show a dot for each point
+		pointDotStrokeWidth: 1,			// Number - Pixel width of point dot stroke
+		pointDotRadius: 4,				// Number - Radius of each point dot in pixels
+		pointHitDetectionRadius: 20,	// Number - amount extra to add to the radius to cater for hit detection outside the drawn point
 
-		//Boolean - Whether to show a stroke for datasets
-		datasetStroke: true,
-
-		//Number - Pixel width of dataset stroke
-		datasetStrokeWidth: 2
+		
+		x: 1
+		
 	};
 
 	chartjs.Type.extend({
@@ -40,25 +37,46 @@
 			//this.chart.ctx // The drawing context for this chart
 			//this.chart.canvas // the canvas node for this chart
 
-			this.datasets = datasets;
+			this.AltPointClass = chartjs.Point.extend({
+				radius: this.options.pointDotRadius,
+				hitDetectionRadius: this.options.pointHitDetectionRadius,
+				strokeWidth: this.options.pointDotStrokeWidth,
+				display: this.options.pointDot,
+				ctx: this.chart.ctx,
+				view: null
+			});
+
+			this.datasets = [];
+
+			//Iterate through each of the datasets, and build this into a property of the chart
+			helpers.each(datasets, function (dataset) {
+
+				var datasetObject = {
+					label: dataset.label || null,
+					strokeColor: dataset.strokeColor,
+					points: []
+				};
+
+				this.datasets.push(datasetObject);
+				
+				helpers.each(dataset.data, function (dataPoint) {
+
+					//Add a new point for each piece of data, passing any required data to draw.
+					datasetObject.points.push(new this.AltPointClass({
+						value: dataPoint,
+						label: dataPoint.y,
+						datasetLabel: dataset.label,
+						strokeColor: 'white',
+						fillColor: dataset.strokeColor,
+						highlightStroke: dataset.strokeColor,
+						highlightFill: 'white'
+					}));
+				}, this);
+
+			}, this);
 
 			this.render();
-			//this.scale = this.buildScale(options.data)
 		},
-
-		//buildScale: function (data) {
-
-		//	var scaleOptions = {
-		//		min: helpers.min(data, function (obj) { return obj.x; }),
-		//		max: helpers.max(data, function (obj) { return obj.x; }),
-		//		height: this.chart.height,
-		//		width: this.chart.width,
-		//		ctx: this.chart.ctx
-		//	}; 
-
-		//	var scale = new chartjs.AltScale(scaleOptions);
-
-		//},
 
 		calculateRange: function () {
 
@@ -67,13 +85,11 @@
 				ymin = undefined,
 				ymax = undefined;
 
-			for (var i = 0; i < this.datasets.length; i++) {
+			helpers.each(this.datasets, function(dataset) {
 
-				var ds = this.datasets[i];
+				helpers.each(dataset.points, function (point) {
 
-				for (var j = 0; j < ds.data.length; j++) {
-
-					var value = ds.data[j];
+					var value = point.value;
 
 					// min x
 					if (xmin === undefined || value.x < xmin) {
@@ -94,8 +110,8 @@
 					if (ymax === undefined || value.y > ymax) {
 						ymax = value.y;
 					}
-				}
-			}
+				});
+			});
 
 			return {
 				xmin: xmin,
@@ -124,10 +140,11 @@
 					var tensionBefore = !!prev ? tension : 0;
 					var tensionAfter = !!next ? tension : 0;
 
-					var innerPrev = prev || current;
-					var innerNext = next || current;
+					var innerCurrent = current.value;
+					var innerPrev = prev ? prev.value : current.value;
+					var innerNext = next ? next.value : current.value;
 
-					var a = { xx: current.x - innerPrev.x, yy: current.y - innerPrev.y }
+					var a = { xx: innerCurrent.x - innerPrev.x, yy: innerCurrent.y - innerPrev.y }
 					var b = { xx: innerNext.x - innerPrev.x, yy: innerNext.y - innerPrev.y }
 
 					var mul = a.xx * b.xx + a.yy * b.yy;
@@ -136,8 +153,8 @@
 					var k = Math.min(Math.max(mul / (mod * mod), 0.3), 0.7);
 
 					var result = {
-						before: { x: current.x - b.xx * k * tensionBefore, y: current.y - b.yy * k * tensionBefore },
-						after: { x: current.x + b.xx * (1 - k) * tensionAfter, y: current.y + b.yy * (1 - k) * tensionAfter }
+						before: { x: innerCurrent.x - b.xx * k * tensionBefore, y: innerCurrent.y - b.yy * k * tensionBefore },
+						after: { x: innerCurrent.x + b.xx * (1 - k) * tensionAfter, y: innerCurrent.y + b.yy * (1 - k) * tensionAfter }
 					};
 
 					if (result.after.y > range.ymax) {
@@ -198,37 +215,33 @@
 					return height - ((y - range.ymin) * height / (range.ymax - range.ymin)) * easingDecimal;
 				},
 
-				calculatePointPositions: function (data) {
-
-					var result = [];
+				updatePointPositions: function (data) {
 
 					for (var i = 0; i < data.length; i++) {
 
 						var current = api.getElementOrDefault(data, i);
 
-						var point = {
-							x: this.calculateX(current.x),
-							y: this.calculateY(current.y)
-						};
+						current.x = this.calculateX(current.value.x);
+						current.y = this.calculateY(current.value.y);
 
 						if (options.bezierCurve) {
+
+							var view = {};
 
 							var prev = api.getElementOrDefault(data, i - 1);
 							var next = api.getElementOrDefault(data, i + 1);
 
 							var obj = api.calculateControlPoints(prev, current, next, options.bezierCurveTension);
 
-							point.x1 = this.calculateX(obj.before.x);
-							point.y1 = this.calculateY(obj.before.y);
+							view.x1 = this.calculateX(obj.before.x);
+							view.y1 = this.calculateY(obj.before.y);
 
-							point.x2 = this.calculateX(obj.after.x);
-							point.y2 = this.calculateY(obj.after.y);
+							view.x2 = this.calculateX(obj.after.x);
+							view.y2 = this.calculateY(obj.after.y);
+
+							current.view = view;
 						}
-
-						result.push(point);
 					}
-
-					return result;
 				},
 
 				calculateXScaleParameters: function() {
@@ -288,14 +301,16 @@
 
 			helpers.each(this.datasets, function (dataset) {
 
+				// update points view params
+				calc.updatePointPositions(dataset.points);
+
 				ctx.lineWidth = this.options.datasetStrokeWidth;
 				ctx.strokeStyle = dataset.strokeColor;
 				ctx.beginPath();
 
-				var points = calc.calculatePointPositions(dataset.data);
-				var prev = points[0];
+				var prev = dataset.points[0];
 
-				helpers.each(points, function (point, index) {
+				helpers.each(dataset.points, function (point, index) {
 
 					if (index === 0) {
 
@@ -305,7 +320,7 @@
 
 						if (this.options.bezierCurve) {
 
-							ctx.bezierCurveTo(prev.x2, prev.y2, point.x1, point.y1, point.x, point.y);
+							ctx.bezierCurveTo(prev.view.x2, prev.view.y2, point.view.x1, point.view.y1, point.x, point.y);
 							prev = point;
 						}
 						else {
@@ -319,33 +334,23 @@
 				ctx.stroke();
 
 				// debug
-				ctx.lineWidth = 0.3;
+				//ctx.lineWidth = 0.3;
 
-				if (this.options.bezierCurve) {
+				//if (this.options.bezierCurve) {
 
-					helpers.each(points, function (point, index) {
+				//	helpers.each(dataset.points, function (point) {
 
-						ctx.beginPath();
-						ctx.moveTo(point.x1, point.y1);
-						ctx.lineTo(point.x2, point.y2);
-						ctx.stroke();
-					});
-				}
+				//		ctx.beginPath();
+				//		ctx.moveTo(point.view.x1, point.view.y1);
+				//		ctx.lineTo(point.view.x2, point.view.y2);
+				//		ctx.stroke();
+				//	});
+				//}
 
-				// points
-				ctx.lineWidth = 1;
-				ctx.strokeStyle = 'white';
-				ctx.fillStyle = dataset.strokeColor;
-
-				helpers.each(points, function (point) {
-
-					ctx.beginPath();
-					ctx.arc(point.x, point.y, 4, 0, 2 * Math.PI, false);
-					ctx.fill();
-					ctx.stroke();
+				// draw points
+				helpers.each(dataset.points, function (point) {
+					point.draw();
 				});
-
-
 
 			}, this);
 
