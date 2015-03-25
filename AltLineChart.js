@@ -167,23 +167,24 @@
 				},
 				calculateScaleParameters: function (min, max) {
 
-					var x = [0.01, 0.1, 1, 10, 100, 1000, 10000];
-
 					var range = max - min;
-					var mul = 0.0001;
-					while (range / mul > 14) {
+					var step = 0.0000001;
+					while (range / step > 20) {
 
-						mul *= 10;
+						step *= 10;
 					}
 
-					var start = (Math.trunc(min / mul) + 1) * mul;
-					var end = Math.trunc(max / mul) * mul;
+					var pos = (Math.trunc(min / step) + 1) * step;
+					var end = Math.trunc(max / step) * step;
 
-					return {
-						start: start,
-						end: end,
-						step: mul
-					};
+					var a = [];
+					while (pos <= end) {
+
+						a.push(pos);
+						pos += step;
+					}
+
+					return a;
 				}
 			};
 
@@ -249,26 +250,39 @@
 			this.clear();
 
 			// axis
-			ctx.strokeStyle = '#eeeeee';
+			ctx.strokeStyle = 'gray';
+			ctx.fillStyle = 'gray';
+			ctx.lineWidth = 0.3;
 
-			//var scaleX = calc.calculateXScaleParameters();
-			//for (var i = scaleX.start; i <= scaleX.end; i += scaleX.step) {
+			var scaleX = calc.calculateXScaleParameters();
+			for (var i = 0; i <= scaleX.length; i++) {
 
-			//	var xpos1 = calc.calculateX(i);
-			//	ctx.beginPath();
-			//	ctx.moveTo(xpos1, 0);
-			//	ctx.lineTo(xpos1, this.chart.height);
-			//	ctx.stroke();
-			//}
+				var xValue = scaleX[i];
+				var xpos1 = calc.calculateX(xValue);
+				ctx.beginPath();
+				ctx.moveTo(xpos1, 0);
+				ctx.lineTo(xpos1, this.chart.height);
+				ctx.stroke();
+
+				ctx.textAlign = "center";
+				ctx.textBaseline = "top";
+				ctx.fillText(xValue, xpos1, 0);
+			}
 
 			var scaleY = calc.calculateXScaleParameters();
-			for (var j = scaleY.start; j <= scaleY.end; j += scaleY.step) {
+			for (var j = 0; j <= scaleY.length; j++) {
 
-				var ypos1 = calc.calculateY(j);
+				var yValue = scaleY[j];
+				var ypos1 = calc.calculateY(yValue);
+
 				ctx.beginPath();
 				ctx.moveTo(0, ypos1);
 				ctx.lineTo(this.chart.width, ypos1);
 				ctx.stroke();
+
+				ctx.textAlign = "right";
+				ctx.textBaseline = "middle";
+				ctx.fillText(yValue, this.chart.width, ypos1);
 			}
 
 
@@ -305,8 +319,7 @@
 				ctx.stroke();
 
 				// debug
-				ctx.lineWidth = 1;
-				ctx.strokeStyle = '#C5D6E0';
+				ctx.lineWidth = 0.3;
 
 				if (this.options.bezierCurve) {
 
