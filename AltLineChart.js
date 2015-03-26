@@ -21,10 +21,10 @@
 		pointDot: true,					// Boolean - Whether to show a dot for each point
 		pointDotStrokeWidth: 1,			// Number - Pixel width of point dot stroke
 		pointDotRadius: 4,				// Number - Radius of each point dot in pixels
-		pointHitDetectionRadius: 5,		// Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+		pointHitDetectionRadius: 8,		// Number - amount extra to add to the radius to cater for hit detection outside the drawn point
 
 
-		
+		multiTooltipTemplate: "<%= label %>",
 		tooltipTemplate: "<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%= value.y %>",
 		
 		x: 1
@@ -123,9 +123,12 @@
 
 			if (elements.length > 0) {
 
-				helpers.each(elements, function (element) {
+				var firstElement = elements[0];
+				var tooltipPosition = firstElement.tooltipPosition();
 
-					var tooltipPosition = element.tooltipPosition();
+				if (elements.length == 1) {
+
+					
 
 					new chartjs.Tooltip({
 						x: Math.round(tooltipPosition.x),
@@ -139,12 +142,51 @@
 						fontSize: this.options.tooltipFontSize,
 						caretHeight: this.options.tooltipCaretSize,
 						cornerRadius: this.options.tooltipCornerRadius,
-						text: helpers.template(this.options.tooltipTemplate, element),
+						text: helpers.template(this.options.tooltipTemplate, firstElement),
 						chart: this.chart,
 						custom: this.options.customTooltips
 					}).draw();
-				}, this);
-	
+				} else {
+
+					var tooltipLabels = [],
+						tooltipColors = [];
+
+					helpers.each(elements, function (point) {
+
+						tooltipLabels.push(helpers.template(this.options.multiTooltipTemplate, point));
+
+						tooltipColors.push({
+							fill: point._saved.fillColor || point.fillColor,
+							stroke: point._saved.strokeColor || point.strokeColor
+						});
+
+					}, this);
+
+					new Chart.MultiTooltip({
+						x: Math.round(tooltipPosition.x),
+						y: Math.round(tooltipPosition.y),
+						xPadding: this.options.tooltipXPadding,
+						yPadding: this.options.tooltipYPadding,
+						xOffset: this.options.tooltipXOffset,
+						fillColor: this.options.tooltipFillColor,
+						textColor: this.options.tooltipFontColor,
+						fontFamily: this.options.tooltipFontFamily,
+						fontStyle: this.options.tooltipFontStyle,
+						fontSize: this.options.tooltipFontSize,
+						titleTextColor: this.options.tooltipTitleFontColor,
+						titleFontFamily: this.options.tooltipTitleFontFamily,
+						titleFontStyle: this.options.tooltipTitleFontStyle,
+						titleFontSize: this.options.tooltipTitleFontSize,
+						cornerRadius: this.options.tooltipCornerRadius,
+						labels: tooltipLabels,
+						legendColors: tooltipColors,
+						legendColorBackground: this.options.multiTooltipKeyBackground,
+						title: '',
+						chart: this.chart,
+						ctx: this.chart.ctx,
+						custom: this.options.customTooltips
+					}).draw();
+				}
 			}
 			return this;
 		},
