@@ -6,11 +6,11 @@
 
 	var defaultConfig = {
 
-		
+
 		// LINES
 
 		datasetStroke: true,			// Boolean - Whether to show a stroke for datasets
-		datasetStrokeWidth: 2,			// Number - Pixel width of dataset stroke
+		datasetStrokeWidth: 3,			// Number - Pixel width of dataset stroke
 
 		bezierCurve: true,				// Boolean - Whether the line is curved between points
 		bezierCurveTension: 0.4,		// Number - Tension of the bezier curve between points
@@ -20,16 +20,61 @@
 		// POINTS
 		pointDot: true,					// Boolean - Whether to show a dot for each point
 		pointDotStrokeWidth: 1,			// Number - Pixel width of point dot stroke
-		pointDotRadius: 4,				// Number - Radius of each point dot in pixels
+		pointDotRadius: 5,				// Number - Radius of each point dot in pixels
 		pointHitDetectionRadius: 8,		// Number - amount extra to add to the radius to cater for hit detection outside the drawn point
 
 
 		multiTooltipTemplate: "<%= label %>",
 		tooltipTemplate: "<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%= value.y %>",
-		
+
 		x: 1
-		
+
 	};
+
+	chartjs.AltScale = chartjs.Element.extend({
+		initialize: function () {
+
+			// this.dataRange - минимальные и максимальные значения данных
+			// this.display - нужно ли отображать шкалу
+
+			// инициализируем настройки
+			// рассчитываем вспомогательные параметры
+
+			this.font = helpers.fontString(this.scaleFontSize, this.scaleFontStyle, this.scaleFontFamily);
+		},
+
+		update: function (newProps) {
+			helpers.extend(this, newProps);
+			this.fit();
+		},
+
+		fit: function () {
+
+			// рассчитываем параметры отображения
+		},
+
+		updatePointPositions: function (points) {
+
+		},
+
+		calculateX: function (x) {
+
+			return (x - this.dataRange.xmin) * width / (this.dataRange.xmax - this.dataRange.xmin);
+		},
+		calculateY: function (y, ease) {
+
+			return height - ((y - this.dataRange.ymin) * height / (this.dataRange.ymax - this.dataRange.ymin)) * (ease || 1);
+		},
+
+		draw: function () {
+			var ctx = this.ctx,
+				yLabelGap = (this.endPoint - this.startPoint) / this.steps,
+				xStart = Math.round(this.xScalePaddingLeft);
+			if (this.display) {
+
+			}
+		}
+	});
 
 	chartjs.Type.extend({
 		name: "AltLineChart",
@@ -61,7 +106,7 @@
 				};
 
 				this.datasets.push(datasetObject);
-				
+
 				helpers.each(dataset.data, function (dataPoint) {
 
 					//Add a new point for each piece of data, passing any required data to draw.
@@ -77,6 +122,8 @@
 				}, this);
 
 			}, this);
+
+			this.buildScale();
 
 			//Set up tooltip events on the chart
 			if (this.options.showTooltips) {
@@ -105,6 +152,23 @@
 			this.render();
 		},
 
+		buildScale: function () {
+
+			var dataRange = this._calculateRange();
+
+			var scaleOptions = {
+				dataRange: dataRange,
+
+				textColor: this.options.scaleFontColor,
+				fontSize: this.options.scaleFontSize,
+				fontStyle: this.options.scaleFontStyle,
+				fontFamily: this.options.scaleFontFamily,
+				beginAtZero: this.options.scaleBeginAtZero,
+			};
+
+			this.scale = new chartjs.AltScale(scaleOptions);
+		},
+
 		// helpers
 		getPointsAtEvent: function (e) {
 			var pointsArray = [],
@@ -117,7 +181,7 @@
 			return pointsArray;
 		},
 
-		showTooltip: function(elements) {
+		showTooltip: function (elements) {
 
 			this.draw();
 
@@ -128,7 +192,7 @@
 
 				if (elements.length == 1) {
 
-					
+
 
 					new chartjs.Tooltip({
 						x: Math.round(tooltipPosition.x),
@@ -191,39 +255,49 @@
 			return this;
 		},
 
-		calculateRange: function () {
+		_forEachPoint: function (callback) {
+
+			helpers.each(this.datasets, function (dataset) {
+
+				helpers.each(dataset.points, callback, this);
+			}, this);
+		},
+
+		_forEachDataset: function (callback) {
+
+			helpers.each(this.datasets, callback, this);
+		},
+
+		_calculateRange: function () {
 
 			var xmin = undefined,
 				xmax = undefined,
 				ymin = undefined,
 				ymax = undefined;
 
-			helpers.each(this.datasets, function(dataset) {
+			this._forEachPoint(function (point) {
 
-				helpers.each(dataset.points, function (point) {
+				var value = point.value;
 
-					var value = point.value;
+				// min x
+				if (xmin === undefined || value.x < xmin) {
+					xmin = value.x;
+				}
 
-					// min x
-					if (xmin === undefined || value.x < xmin) {
-						xmin = value.x;
-					}
+				// max x
+				if (xmax === undefined || value.x > xmax) {
+					xmax = value.x;
+				}
 
-					// max x
-					if (xmax === undefined || value.x > xmax) {
-						xmax = value.x;
-					}
+				// min y
+				if (ymin === undefined || value.y < ymin) {
+					ymin = value.y;
+				}
 
-					// min y
-					if (ymin === undefined || value.y < ymin) {
-						ymin = value.y;
-					}
-
-					// max y
-					if (ymax === undefined || value.y > ymax) {
-						ymax = value.y;
-					}
-				});
+				// max y
+				if (ymax === undefined || value.y > ymax) {
+					ymax = value.y;
+				}
 			});
 
 			return {
@@ -237,12 +311,12 @@
 		initCalculator: function (ease, options) {
 
 			var easingDecimal = ease || 1,
-				range = this.calculateRange(),
+				range = this._calculateRange(),
 				width = this.chart.width,
 				height = this.chart.height;
 
 			var api = {
-				trunc: function(x) {
+				trunc: function (x) {
 					return x < 0 ? Math.ceil(x) : Math.floor(x);
 				},
 				getElementOrDefault: function (array, index, defaultValue) {
@@ -360,116 +434,74 @@
 					}
 				},
 
-				calculateXScaleParameters: function() {
+				calculateXScaleParameters: function () {
 
 					return api.calculateScaleParameters(range.xmin, range.xmax);
 				},
-				calculateYScaleParameters: function() {
+				calculateYScaleParameters: function () {
 
 					return api.calculateScaleParameters(range.ymin, range.ymax);
 				}
 			};
 		},
 
-		// Used to draw something on the canvas
-		draw: function (ease) {
+		_drawLine: function (dataset) {
 
-			var calc = this.initCalculator(ease, this.options);
+			ctx.lineWidth = this.options.datasetStrokeWidth;
+			ctx.strokeStyle = dataset.strokeColor;
+			ctx.beginPath();
 
-			this.clear();
+			var prev = dataset.points[0];
 
-			// axis
-			ctx.strokeStyle = 'gray';
-			ctx.fillStyle = 'gray';
-			ctx.lineWidth = 0.3;
+			helpers.each(dataset.points, function (point, index) {
 
-			var scaleX = calc.calculateXScaleParameters();
-			for (var i = 0; i <= scaleX.length; i++) {
+				if (index === 0) {
 
-				var xValue = scaleX[i];
-				var xpos1 = calc.calculateX(xValue);
-				ctx.beginPath();
-				ctx.moveTo(xpos1, 0);
-				ctx.lineTo(xpos1, this.chart.height);
-				ctx.stroke();
+					ctx.moveTo(point.x, point.y);
+				}
+				else {
 
-				ctx.textAlign = "center";
-				ctx.textBaseline = "top";
-				ctx.fillText(xValue, xpos1, 0);
-			}
+					if (this.options.bezierCurve) {
 
-			var scaleY = calc.calculateXScaleParameters();
-			for (var j = 0; j <= scaleY.length; j++) {
-
-				var yValue = scaleY[j];
-				var ypos1 = calc.calculateY(yValue);
-
-				ctx.beginPath();
-				ctx.moveTo(0, ypos1);
-				ctx.lineTo(this.chart.width, ypos1);
-				ctx.stroke();
-
-				ctx.textAlign = "right";
-				ctx.textBaseline = "middle";
-				ctx.fillText(yValue, this.chart.width, ypos1);
-			}
-
-
-			helpers.each(this.datasets, function (dataset) {
-
-				// update points view params
-				calc.updatePointPositions(dataset.points);
-
-				ctx.lineWidth = this.options.datasetStrokeWidth;
-				ctx.strokeStyle = dataset.strokeColor;
-				ctx.beginPath();
-
-				var prev = dataset.points[0];
-
-				helpers.each(dataset.points, function (point, index) {
-
-					if (index === 0) {
-
-						ctx.moveTo(point.x, point.y);
+						ctx.bezierCurveTo(prev.view.x2, prev.view.y2, point.view.x1, point.view.y1, point.x, point.y);
+						prev = point;
 					}
 					else {
 
-						if (this.options.bezierCurve) {
-
-							ctx.bezierCurveTo(prev.view.x2, prev.view.y2, point.view.x1, point.view.y1, point.x, point.y);
-							prev = point;
-						}
-						else {
-
-							ctx.lineTo(point.x, point.y);
-						}
+						ctx.lineTo(point.x, point.y);
 					}
-
-				}, this);
-
-				ctx.stroke();
-
-				// debug
-				//ctx.lineWidth = 0.3;
-
-				//if (this.options.bezierCurve) {
-
-				//	helpers.each(dataset.points, function (point) {
-
-				//		ctx.beginPath();
-				//		ctx.moveTo(point.view.x1, point.view.y1);
-				//		ctx.lineTo(point.view.x2, point.view.y2);
-				//		ctx.stroke();
-				//	});
-				//}
-
-				// draw points
-				helpers.each(dataset.points, function (point) {
-					point.draw();
-				});
+				}
 
 			}, this);
 
+			ctx.stroke();
+		},
+
+		// Used to draw something on the canvas
+		draw: function (ease) {
+
+			//var calc = this.initCalculator(ease, this.options);
+
+			// update view params
+			this.scale.fit();
+			this._forEachDataset(function (dataset) {
+				this.scale.updatePointPositions(dataset.points);
+			});
+
+			// draw
+			this.clear();
+			this.scale.draw();
+
+			helpers.each(this.datasets, function (dataset) {
+
+				this._drawLine(dataset);
+			}, this);
+
+			// draw points
+			this._forEachPoint(function (point) {
+
+				point.draw();
+			});
 		}
 	});
 
