@@ -11,6 +11,7 @@
 
 		datasetStroke: true,			// Boolean - Whether to show a stroke for datasets
 		datasetStrokeWidth: 3,			// Number - Pixel width of dataset stroke
+		datasetStrokeColor: '#007ACC',	// String - Color of dataset stroke
 
 		bezierCurve: true,				// Boolean - Whether the line is curved between points
 		bezierCurveTension: 0.4,		// Number - Tension of the bezier curve between points
@@ -50,29 +51,72 @@
 
 		fit: function () {
 
+			this.api = {
+
+				trunc: function (x) {
+					return x < 0 ? Math.ceil(x) : Math.floor(x);
+				},
+
+				getElementOrDefault: function (array, index, defaultValue) {
+
+					return index >= 0 && index < array.length
+						? array[index]
+						: defaultValue;
+				}
+			};
+
 			// рассчитываем параметры отображения
 		},
 
-		updatePointPositions: function (points) {
+		updateBezierControlPoints: function (dataSetPoints, ease, tension) {
 
+			for (var i = 0; i < dataSetPoints.length; i++) {
+
+				var current = this.api.getElementOrDefault(data, i);
+				var prev = this.api.getElementOrDefault(data, i - 1);
+				var next = this.api.getElementOrDefault(data, i + 1);
+
+				var obj = api.calculateControlPoints(prev, current, next, tension);
+
+				current.controlPoints = {
+
+					x1: this.calculateX(obj.before.x),
+					y1: this.calculateY(obj.before.y, ease),
+
+					x2: this.calculateX(obj.after.x),
+					y2: this.calculateY(obj.after.y, ease)
+				};
+			}
+		},
+
+		updatePoints: function (dataSetPoints, ease) {
+
+			for (var i = 0; i < dataSetPoints.length; i++) {
+
+				var current = dataSetPoints[i];
+
+				current.x = this.calculateX(current.value.x);
+				current.y = this.calculateY(current.value.y, ease);
+			}
 		},
 
 		calculateX: function (x) {
 
-			return (x - this.dataRange.xmin) * width / (this.dataRange.xmax - this.dataRange.xmin);
+			return (x - this.dataRange.xmin) * this.chart.width / (this.dataRange.xmax - this.dataRange.xmin);
 		},
 		calculateY: function (y, ease) {
 
-			return height - ((y - this.dataRange.ymin) * height / (this.dataRange.ymax - this.dataRange.ymin)) * (ease || 1);
+			return this.chart.height - ((y - this.dataRange.ymin) * this.chart.height / (this.dataRange.ymax - this.dataRange.ymin)) * (ease || 1);
 		},
 
 		draw: function () {
-			var ctx = this.ctx,
-				yLabelGap = (this.endPoint - this.startPoint) / this.steps,
-				xStart = Math.round(this.xScalePaddingLeft);
-			if (this.display) {
 
-			}
+			//var ctx = this.chart.ctx,
+			//	yLabelGap = (this.endPoint - this.startPoint) / this.steps,
+			//	xStart = Math.round(this.xScalePaddingLeft);
+			//if (this.display) {
+
+			//}
 		}
 	});
 
@@ -158,12 +202,13 @@
 
 			var scaleOptions = {
 				dataRange: dataRange,
+				chart: this.chart,
 
 				textColor: this.options.scaleFontColor,
 				fontSize: this.options.scaleFontSize,
 				fontStyle: this.options.scaleFontStyle,
 				fontFamily: this.options.scaleFontFamily,
-				beginAtZero: this.options.scaleBeginAtZero,
+				beginAtZero: this.options.scaleBeginAtZero
 			};
 
 			this.scale = new chartjs.AltScale(scaleOptions);
@@ -308,147 +353,14 @@
 			}
 		},
 
-		initCalculator: function (ease, options) {
-
-			var easingDecimal = ease || 1,
-				range = this._calculateRange(),
-				width = this.chart.width,
-				height = this.chart.height;
-
-			var api = {
-				trunc: function (x) {
-					return x < 0 ? Math.ceil(x) : Math.floor(x);
-				},
-				getElementOrDefault: function (array, index, defaultValue) {
-
-					return index >= 0 && index < array.length
-						? array[index]
-						: defaultValue;
-				},
-				calculateControlPoints: function (prev, current, next, tension) {
-
-					var tensionBefore = !!prev ? tension : 0;
-					var tensionAfter = !!next ? tension : 0;
-
-					var innerCurrent = current.value;
-					var innerPrev = prev ? prev.value : current.value;
-					var innerNext = next ? next.value : current.value;
-
-					var a = { xx: innerCurrent.x - innerPrev.x, yy: innerCurrent.y - innerPrev.y }
-					var b = { xx: innerNext.x - innerPrev.x, yy: innerNext.y - innerPrev.y }
-
-					var mul = a.xx * b.xx + a.yy * b.yy;
-					var mod = Math.sqrt(b.xx * b.xx + b.yy * b.yy);
-
-					var k = Math.min(Math.max(mul / (mod * mod), 0.3), 0.7);
-
-					var result = {
-						before: { x: innerCurrent.x - b.xx * k * tensionBefore, y: innerCurrent.y - b.yy * k * tensionBefore },
-						after: { x: innerCurrent.x + b.xx * (1 - k) * tensionAfter, y: innerCurrent.y + b.yy * (1 - k) * tensionAfter }
-					};
-
-					if (result.after.y > range.ymax) {
-
-						result.after.y = range.ymax;
-					} else {
-
-						if (result.after.y < range.ymin) {
-
-							result.after.y = range.ymin;
-						}
-					}
-
-					// Cap inner bezier handles to the upper/lower scale bounds
-					if (result.before.y > range.ymax) {
-
-						result.before.y = range.ymax;
-					} else {
-
-						if (result.before.y < range.ymin) {
-
-							result.before.y = range.ymin;
-						}
-					}
-
-					return result;
-				},
-				calculateScaleParameters: function (min, max) {
-
-					var range = max - min;
-					var step = 0.0000001;
-					while (range / step > 20) {
-
-						step *= 10;
-					}
-
-					var pos = (api.trunc(min / step) + 1) * step;
-					var end = api.trunc(max / step) * step;
-
-					var a = [];
-					while (pos <= end) {
-
-						a.push(pos);
-						pos += step;
-					}
-
-					return a;
-				}
-			};
-
-			return {
-				calculateX: function (x) {
-
-					return (x - range.xmin) * width / (range.xmax - range.xmin);
-				},
-				calculateY: function (y) {
-
-					return height - ((y - range.ymin) * height / (range.ymax - range.ymin)) * easingDecimal;
-				},
-
-				updatePointPositions: function (data) {
-
-					for (var i = 0; i < data.length; i++) {
-
-						var current = api.getElementOrDefault(data, i);
-
-						current.x = this.calculateX(current.value.x);
-						current.y = this.calculateY(current.value.y);
-
-						if (options.bezierCurve) {
-
-							var view = {};
-
-							var prev = api.getElementOrDefault(data, i - 1);
-							var next = api.getElementOrDefault(data, i + 1);
-
-							var obj = api.calculateControlPoints(prev, current, next, options.bezierCurveTension);
-
-							view.x1 = this.calculateX(obj.before.x);
-							view.y1 = this.calculateY(obj.before.y);
-
-							view.x2 = this.calculateX(obj.after.x);
-							view.y2 = this.calculateY(obj.after.y);
-
-							current.view = view;
-						}
-					}
-				},
-
-				calculateXScaleParameters: function () {
-
-					return api.calculateScaleParameters(range.xmin, range.xmax);
-				},
-				calculateYScaleParameters: function () {
-
-					return api.calculateScaleParameters(range.ymin, range.ymax);
-				}
-			};
-		},
-
 		_drawLine: function (dataset) {
 
+			return;
+
+			var ctx = this.chart.ctx;
+
 			ctx.lineWidth = this.options.datasetStrokeWidth;
-			ctx.strokeStyle = dataset.strokeColor;
+			ctx.strokeStyle = dataset.strokeColor || this.options.datasetStrokeColor;
 			ctx.beginPath();
 
 			var prev = dataset.points[0];
@@ -484,18 +396,22 @@
 
 			// update view params
 			this.scale.fit();
+
 			this._forEachDataset(function (dataset) {
-				this.scale.updatePointPositions(dataset.points);
+
+				this.scale.updatePoints(dataset.points, ease);
+
+				if (this.options.bezierCurve) {
+
+					this.scale.updateBezierControlPoints(dataset.points, ease, this.options.bezierCurveTension);
+				}
 			});
 
 			// draw
 			this.clear();
 			this.scale.draw();
 
-			helpers.each(this.datasets, function (dataset) {
-
-				this._drawLine(dataset);
-			}, this);
+			helpers.each(this.datasets, this._drawLine, this);
 
 			// draw points
 			this._forEachPoint(function (point) {

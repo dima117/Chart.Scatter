@@ -56,7 +56,7 @@
 
 		Chart.defaults.global.responsive = true;
 		var ctx = document.getElementById("myChart").getContext("2d");
-		var myLineChart = new Chart(ctx).AltLineChart(data);
+		var myLineChart = new Chart(ctx).AltLineChart(data, { bezierCurve: false, showTooltips: false });
 
 	</script>
 </body>
