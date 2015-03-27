@@ -10,7 +10,7 @@
 		// LINES
 
 		datasetStroke: true,			// Boolean - Whether to show a stroke for datasets
-		datasetStrokeWidth: 3,			// Number - Pixel width of dataset stroke
+		datasetStrokeWidth: 2,			// Number - Pixel width of dataset stroke
 		datasetStrokeColor: '#007ACC',	// String - Color of dataset stroke
 
 		bezierCurve: true,				// Boolean - Whether the line is curved between points
@@ -21,15 +21,12 @@
 		// POINTS
 		pointDot: true,					// Boolean - Whether to show a dot for each point
 		pointDotStrokeWidth: 1,			// Number - Pixel width of point dot stroke
-		pointDotRadius: 5,				// Number - Radius of each point dot in pixels
-		pointHitDetectionRadius: 8,		// Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+		pointDotRadius: 4,				// Number - Radius of each point dot in pixels
+		pointHitDetectionRadius: 4,		// Number - amount extra to add to the radius to cater for hit detection outside the drawn point
 
 
 		multiTooltipTemplate: "<%= label %>",
-		tooltipTemplate: "<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%= value.y %>",
-
-		x: 1
-
+		tooltipTemplate: "<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%= value.y %>"
 	};
 
 	chartjs.AltScale = chartjs.Element.extend({
@@ -355,15 +352,14 @@
 
 		_drawLine: function (dataset) {
 
-			return;
+			var ctx = this.chart.ctx,
+				prev = undefined;
 
-			var ctx = this.chart.ctx;
-
+			ctx.lineJoin = "round";
 			ctx.lineWidth = this.options.datasetStrokeWidth;
 			ctx.strokeStyle = dataset.strokeColor || this.options.datasetStrokeColor;
-			ctx.beginPath();
 
-			var prev = dataset.points[0];
+			ctx.beginPath();
 
 			helpers.each(dataset.points, function (point, index) {
 
@@ -375,7 +371,13 @@
 
 					if (this.options.bezierCurve) {
 
-						ctx.bezierCurveTo(prev.view.x2, prev.view.y2, point.view.x1, point.view.y1, point.x, point.y);
+						ctx.bezierCurveTo(
+							prev.controlPoints.x2,
+							prev.controlPoints.y2,
+							point.controlPoints.x1,
+							point.controlPoints.y1,
+							point.x, point.y);
+
 						prev = point;
 					}
 					else {
@@ -411,13 +413,17 @@
 			this.clear();
 			this.scale.draw();
 
-			helpers.each(this.datasets, this._drawLine, this);
+			// draw lines
+			if (this.options.datasetStroke) {
+
+				helpers.each(this.datasets, this._drawLine, this);
+			}
 
 			// draw points
-			this._forEachPoint(function (point) {
+			if (this.options.pointDot) {
 
-				point.draw();
-			});
+				this._forEachPoint(function (point) { point.draw(); });
+			}
 		}
 	});
 
