@@ -8,7 +8,6 @@
 
 
 		// LINES
-
 		datasetStroke: true,			// Boolean - Whether to show a stroke for datasets
 		datasetStrokeWidth: 2,			// Number - Pixel width of dataset stroke
 		datasetStrokeColor: '#007ACC',	// String - Color of dataset stroke
@@ -101,11 +100,34 @@
 				return result;
 			},
 
+			calculateScaleParameters: function (min, max) {
+
+				var range = max - min;
+				var step = 0.000000001;
+				while (range / step > 25) {
+
+					step *= 10;
+				}
+
+				var pos = (this.trunc(min / step) + 1) * step;
+				var end = this.trunc(max / step) * step;
+
+				var a = [];
+				while (pos <= end) {
+
+					a.push(pos);
+					pos += step;
+				}
+
+				return a;
+			}
 		},
 
 		fit: function () {
 
 			// рассчитываем параметры отображения
+			this.xvalues = this.api.calculateScaleParameters(this.dataRange.xmin, this.dataRange.xmax);
+			this.yvalues = this.api.calculateScaleParameters(this.dataRange.ymin, this.dataRange.ymax);
 		},
 
 		updateBezierControlPoints: function (dataSetPoints, ease, tension) {
@@ -157,6 +179,36 @@
 			//if (this.display) {
 
 			//}
+
+			ctx.strokeStyle = 'gray';
+			ctx.fillStyle = 'gray';
+			ctx.lineWidth = 0.3;
+
+			// x axis
+			var ypos1 = this.calculateY(this.dataRange.ymin);
+			var ypos2 = this.calculateY(this.dataRange.ymax);
+			helpers.each(this.xvalues, function (value) {
+
+				var xpos = this.calculateX(value);
+
+				ctx.beginPath();
+				ctx.moveTo(xpos, ypos1);
+				ctx.lineTo(xpos, ypos2);
+				ctx.stroke();
+			}, this);
+
+			// y axis
+			var xpos1 = this.calculateX(this.dataRange.xmin);
+			var xpos2 = this.calculateX(this.dataRange.xmax);
+			helpers.each(this.yvalues, function(value) {
+
+				var ypos = this.calculateY(value);
+
+				ctx.beginPath();
+				ctx.moveTo(xpos1, ypos);
+				ctx.lineTo(xpos2, ypos);
+				ctx.stroke();
+			}, this);
 		}
 	});
 
@@ -174,8 +226,7 @@
 				hitDetectionRadius: this.options.pointHitDetectionRadius,
 				strokeWidth: this.options.pointDotStrokeWidth,
 				display: this.options.pointDot,
-				ctx: this.chart.ctx,
-				view: null
+				ctx: this.chart.ctx
 			});
 
 			this.datasets = [];
@@ -451,8 +502,6 @@
 
 		// Used to draw something on the canvas
 		draw: function (ease) {
-
-			//var calc = this.initCalculator(ease, this.options);
 
 			// update view params
 			this.scale.fit();

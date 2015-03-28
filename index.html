@@ -9,7 +9,7 @@
 	<script src="AltLineChart.js"></script>
 </head>
 <body>
-	<canvas id="myChart" width="480" height="320" style="border: 1px solid gray;"></canvas>
+	<canvas id="myChart" width="480" height="220" style="border: 1px solid gray;"></canvas>
 
 	<script>
 
@@ -30,7 +30,7 @@
 				label: 'simple-2',
 				strokeColor: 'red',
 				data: [
-					{ x: 19, y: 100 }, { x: 112, y: 105 }
+					{ x: 19, y: 160 }, { x: 112, y: 105 }
 				]
 			}
 			,
@@ -55,6 +55,7 @@
 
 
 		Chart.defaults.global.responsive = true;
+		//Chart.defaults.global.animation = false;
 		var ctx = document.getElementById("myChart").getContext("2d");
 		var myLineChart = new Chart(ctx).AltLineChart(data, { bezierCurve: true, showTooltips: false });
 
