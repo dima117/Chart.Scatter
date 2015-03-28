@@ -14,12 +14,12 @@
 	<script>
 
 		var data = [
-			//{
-			//	strokeColor: '#F16220',
-			//	data: [
-			//		{ x: 20, y: 5 }, { x: 50, y: 40 }, { x: 90, y: 5 }
-			//	]
-			//},
+			{
+				strokeColor: '#F16220',
+				data: [
+					{ x: 20, y: 5 }, { x: 50, y: 40 }, { x: 90, y: 5 }
+				]
+			},
 			{
 				label: 'simple-1',
 				data: [
@@ -47,7 +47,7 @@
 				strokeColor: '#007ACC',
 				data: [
 					{ x: 19, y: 75 }, { x: 27, y: 69 }, { x: 28, y: 70 }, { x: 40, y: 31 },
-					{ x: 48, y: 76 }, { x: 52, y: 32 }, { x: 33, y: 40 },
+					{ x: 48, y: 76 }, { x: 52, y: 23 }, { x: 24, y: 32 },
 					{ x: 86, y: 45 }, { x: 90, y: 50 }
 				]
 			}
@@ -56,7 +56,7 @@
 
 		Chart.defaults.global.responsive = true;
 		var ctx = document.getElementById("myChart").getContext("2d");
-		var myLineChart = new Chart(ctx).AltLineChart(data, { bezierCurve: false, showTooltips: false });
+		var myLineChart = new Chart(ctx).AltLineChart(data, { bezierCurve: true, showTooltips: false });
 
 	</script>
 </body>

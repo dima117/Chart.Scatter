@@ -46,21 +46,64 @@
 			this.fit();
 		},
 
+		api: {
+
+			trunc: function (x) {
+				return x < 0 ? Math.ceil(x) : Math.floor(x);
+			},
+
+			getElementOrDefault: function (array, index, defaultValue) {
+
+				return index >= 0 && index < array.length
+					? array[index]
+					: defaultValue;
+			},
+
+			applyRange: function (value, min, max) {
+
+				return value > max ? max
+					: value < min ? min
+					: value;
+			},
+
+			calculateControlPoints: function (prev, current, next, range, tension) {
+
+				var tensionBefore = !!prev ? tension : 0;
+				var tensionAfter = !!next ? tension : 0;
+
+				var innerCurrent = current.value;
+				var innerPrev = prev ? prev.value : current.value;
+				var innerNext = next ? next.value : current.value;
+
+				var a = { xx: innerCurrent.x - innerPrev.x, yy: innerCurrent.y - innerPrev.y }
+				var b = { xx: innerNext.x - innerPrev.x, yy: innerNext.y - innerPrev.y }
+
+				var mul = a.xx * b.xx + a.yy * b.yy;
+				var mod = Math.sqrt(b.xx * b.xx + b.yy * b.yy);
+
+				var k = Math.min(Math.max(mul / (mod * mod), 0.3), 0.7);
+
+				var result = {
+					before: {
+						x: innerCurrent.x - b.xx * k * tensionBefore,
+						y: innerCurrent.y - b.yy * k * tensionBefore
+					},
+					after: {
+						x: innerCurrent.x + b.xx * (1 - k) * tensionAfter,
+						y: innerCurrent.y + b.yy * (1 - k) * tensionAfter
+					}
+				};
+
+				// Cap inner bezier handles to the upper/lower scale bounds
+				result.before.y = this.applyRange(result.before.y, range.ymin, range.ymax);
+				result.after.y = this.applyRange(result.after.y, range.ymin, range.ymax);
+
+				return result;
+			},
+
+		},
+
 		fit: function () {
-
-			this.api = {
-
-				trunc: function (x) {
-					return x < 0 ? Math.ceil(x) : Math.floor(x);
-				},
-
-				getElementOrDefault: function (array, index, defaultValue) {
-
-					return index >= 0 && index < array.length
-						? array[index]
-						: defaultValue;
-				}
-			};
 
 			// рассчитываем параметры отображения
 		},
@@ -69,11 +112,11 @@
 
 			for (var i = 0; i < dataSetPoints.length; i++) {
 
-				var current = this.api.getElementOrDefault(data, i);
-				var prev = this.api.getElementOrDefault(data, i - 1);
-				var next = this.api.getElementOrDefault(data, i + 1);
+				var current = this.api.getElementOrDefault(dataSetPoints, i);
+				var prev = this.api.getElementOrDefault(dataSetPoints, i - 1);
+				var next = this.api.getElementOrDefault(dataSetPoints, i + 1);
 
-				var obj = api.calculateControlPoints(prev, current, next, tension);
+				var obj = this.api.calculateControlPoints(prev, current, next, this.dataRange, tension);
 
 				current.controlPoints = {
 
@@ -377,8 +420,6 @@
 							point.controlPoints.x1,
 							point.controlPoints.y1,
 							point.x, point.y);
-
-						prev = point;
 					}
 					else {
 
@@ -386,9 +427,26 @@
 					}
 				}
 
+				prev = point;
+
 			}, this);
 
 			ctx.stroke();
+
+			// debug
+			//if (this.options.bezierCurve) {
+
+			//	ctx.lineWidth = 0.3;
+
+			//	helpers.each(dataset.points, function(point) {
+
+			//		ctx.beginPath();
+			//		ctx.moveTo(point.controlPoints.x1, point.controlPoints.y1);
+			//		ctx.lineTo(point.x, point.y);
+			//		ctx.lineTo(point.controlPoints.x2, point.controlPoints.y2);
+			//		ctx.stroke();
+			//	});
+			//}
 		},
 
 		// Used to draw something on the canvas
