@@ -6,6 +6,14 @@
 
 	var defaultConfig = {
 
+		// SCALE
+		scaleShowGridLines: true,				//Boolean - Whether grid lines are shown across the chart
+		scaleGridLineWidth: 1,					//Number - Width of the grid lines
+		scaleGridLineColor: "rgba(0,0,0,.05)",	//String - Colour of the grid lines
+		scaleShowHorizontalLines: true,			//Boolean - Whether to show horizontal lines (except X axis)
+		scaleShowVerticalLines: true,			//Boolean - Whether to show vertical lines (except Y axis)
+
+
 
 		// LINES
 		datasetStroke: true,			// Boolean - Whether to show a stroke for datasets
@@ -29,6 +37,9 @@
 	};
 
 	chartjs.AltScale = chartjs.Element.extend({
+
+		padding: 10,
+
 		initialize: function () {
 
 			// this.dataRange - минимальные и максимальные значения данных
@@ -120,6 +131,18 @@
 				}
 
 				return a;
+			},
+
+			formatLabels: function (values) {
+
+				var a = [];
+
+				for (var i = 0; i < values.length; i++) {
+
+					a.push(helpers.template(this.labelTemplate, { value: values[i] }));
+				}
+
+				return a;
 			}
 		},
 
@@ -128,6 +151,10 @@
 			// рассчитываем параметры отображения
 			this.xvalues = this.api.calculateScaleParameters(this.dataRange.xmin, this.dataRange.xmax);
 			this.yvalues = this.api.calculateScaleParameters(this.dataRange.ymin, this.dataRange.ymax);
+
+			this.yLabels = this.api.formatLabels.call(this, this.yvalues);
+			this.xLabelPadding = this.showLabels
+				? helpers.longestText(this.chart.ctx, this.font, this.yLabels) + this.padding : 0;
 		},
 
 		updateBezierControlPoints: function (dataSetPoints, ease, tension) {
@@ -164,7 +191,7 @@
 
 		calculateX: function (x) {
 
-			return (x - this.dataRange.xmin) * this.chart.width / (this.dataRange.xmax - this.dataRange.xmin);
+			return this.xLabelPadding + ((x - this.dataRange.xmin) * (this.chart.width - this.xLabelPadding) / (this.dataRange.xmax - this.dataRange.xmin));
 		},
 		calculateY: function (y, ease) {
 
@@ -173,42 +200,70 @@
 
 		draw: function () {
 
-			//var ctx = this.chart.ctx,
-			//	yLabelGap = (this.endPoint - this.startPoint) / this.steps,
-			//	xStart = Math.round(this.xScalePaddingLeft);
-			//if (this.display) {
+			var ctx = this.chart.ctx;
 
-			//}
+			if (this.display) {
 
-			ctx.strokeStyle = 'gray';
-			ctx.fillStyle = 'gray';
-			ctx.lineWidth = 0.3;
+				// y axis
+				var xpos1 = this.calculateX(this.dataRange.xmin);
+				var xpos2 = this.calculateX(this.dataRange.xmax);
 
-			// x axis
-			var ypos1 = this.calculateY(this.dataRange.ymin);
-			var ypos2 = this.calculateY(this.dataRange.ymax);
-			helpers.each(this.xvalues, function (value) {
+				helpers.each(this.yvalues, function (value, index) {
 
-				var xpos = this.calculateX(value);
+					var ypos = this.calculateY(value);
 
-				ctx.beginPath();
-				ctx.moveTo(xpos, ypos1);
-				ctx.lineTo(xpos, ypos2);
-				ctx.stroke();
-			}, this);
+					if (this.showHorizontalLines) {
 
-			// y axis
-			var xpos1 = this.calculateX(this.dataRange.xmin);
-			var xpos2 = this.calculateX(this.dataRange.xmax);
-			helpers.each(this.yvalues, function(value) {
+						ctx.lineWidth = this.gridLineWidth;
+						ctx.strokeStyle = this.gridLineColor;
 
-				var ypos = this.calculateY(value);
+						ctx.beginPath();
+						ctx.moveTo(xpos1, ypos);
+						ctx.lineTo(xpos2, ypos);
+						ctx.stroke();
+					}
 
-				ctx.beginPath();
-				ctx.moveTo(xpos1, ypos);
-				ctx.lineTo(xpos2, ypos);
-				ctx.stroke();
-			}, this);
+					// labels
+					if (this.showLabels) {
+	
+						// черточки
+						ctx.lineWidth = this.lineWidth;
+						ctx.strokeStyle = this.lineColor;
+
+						ctx.beginPath();
+						ctx.moveTo(xpos1, ypos);
+						ctx.lineTo(xpos1 - 5, ypos);
+						ctx.stroke();
+
+						// text
+						ctx.fillStyle = this.textColor;
+						ctx.font = this.font;
+						ctx.textAlign = "right";
+						ctx.textBaseline = "middle";
+						ctx.fillText(this.yLabels[index], xpos1 - 7, ypos);
+					}
+
+				}, this);
+
+				// x axis
+				var ypos1 = this.calculateY(this.dataRange.ymin);
+				var ypos2 = this.calculateY(this.dataRange.ymax);
+
+				helpers.each(this.xvalues, function (value) {
+
+					var xpos = this.calculateX(value);
+
+					if (this.showVerticalLines) {
+
+						ctx.beginPath();
+						ctx.moveTo(xpos, ypos1);
+						ctx.lineTo(xpos, ypos2);
+						ctx.stroke();
+					}
+
+				}, this);
+
+			}
 		}
 	});
 
@@ -299,7 +354,17 @@
 				fontSize: this.options.scaleFontSize,
 				fontStyle: this.options.scaleFontStyle,
 				fontFamily: this.options.scaleFontFamily,
-				beginAtZero: this.options.scaleBeginAtZero
+
+				labelTemplate: this.options.scaleLabel,
+				showLabels: this.options.scaleShowLabels,
+
+				gridLineWidth: (this.options.scaleShowGridLines) ? this.options.scaleGridLineWidth : 0,
+				gridLineColor: (this.options.scaleShowGridLines) ? this.options.scaleGridLineColor : "rgba(0,0,0,0)",
+				showHorizontalLines: this.options.scaleShowHorizontalLines,
+				showVerticalLines: this.options.scaleShowVerticalLines,
+				lineWidth: this.options.scaleLineWidth,
+				lineColor: this.options.scaleLineColor,
+				display: this.options.showScale
 			};
 
 			this.scale = new chartjs.AltScale(scaleOptions);

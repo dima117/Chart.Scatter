@@ -8,10 +8,10 @@
 
 				var xValue = scaleX[i];
 				var xpos1 = calc.calculateX(xValue);
-				ctx.beginPath();
-				ctx.moveTo(xpos1, 0);
-				ctx.lineTo(xpos1, this.chart.height);
-				ctx.stroke();
+				//ctx.beginPath();
+				//ctx.moveTo(xpos1, 0);
+				//ctx.lineTo(xpos1, this.chart.height);
+				//ctx.stroke();
 
 				ctx.textAlign = "center";
 				ctx.textBaseline = "top";
@@ -24,10 +24,10 @@
 				var yValue = scaleY[j];
 				var ypos1 = calc.calculateY(yValue);
 
-				ctx.beginPath();
-				ctx.moveTo(0, ypos1);
-				ctx.lineTo(this.chart.width, ypos1);
-				ctx.stroke();
+				//ctx.beginPath();
+				//ctx.moveTo(0, ypos1);
+				//ctx.lineTo(this.chart.width, ypos1);
+				//ctx.stroke();
 
 				ctx.textAlign = "right";
 				ctx.textBaseline = "middle";
@@ -36,3 +36,6 @@
 
 
 
+
+
+			helpers.longestText = function(ctx,font,arrayOfStrings){

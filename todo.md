@@ -11,4 +11,5 @@
 9. ~~animation~~
 10. documentation
 11. change point data structure
+12. override scale + scaleBeginAtZero
  

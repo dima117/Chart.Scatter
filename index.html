@@ -57,7 +57,12 @@
 		Chart.defaults.global.responsive = true;
 		//Chart.defaults.global.animation = false;
 		var ctx = document.getElementById("myChart").getContext("2d");
-		var myLineChart = new Chart(ctx).AltLineChart(data, { bezierCurve: true, showTooltips: false });
+		var myLineChart = new Chart(ctx).AltLineChart(data, {
+			bezierCurve: true,
+			showTooltips: false,
+			scaleShowLabels: true,
+			scaleLabel: "<%=value%>°C"
+		});
 
 	</script>
 </body>
