@@ -6,6 +6,20 @@
 
 	var defaultConfig = {
 
+		// INHERIT
+		// showScale: true,						// Boolean - If we should show the scale at all
+		// scaleOverride: false,				// Boolean - If we want to override with a hard coded scale
+		// ** Required if scaleOverride is true **
+		// *** scaleSteps: null,				// Number - The number of steps in a hard coded scale
+		// *** scaleStepWidth: null,			// Number - The value jump in the hard coded scale
+		// *** scaleStartValue: null,			// Number - The scale starting value
+
+		// scaleLineColor: "rgba(0,0,0,.1)",		// String - Colour of the scale line
+		// scaleLineWidth: 1,						// Number - Pixel width of the scale line
+		// scaleShowLabels: true,					// Boolean - Whether to show labels on the scale
+		// scaleLabel: "<%=value%>",				// Interpolated JS string - can access value
+
+
 		// SCALE
 		scaleShowGridLines: true,				//Boolean - Whether grid lines are shown across the chart
 		scaleGridLineWidth: 1,					//Number - Width of the grid lines
@@ -150,8 +164,13 @@
 
 			// рассчитываем параметры отображения
 			this.xvalues = this.api.calculateScaleParameters(this.dataRange.xmin, this.dataRange.xmax);
-			this.yvalues = this.api.calculateScaleParameters(this.dataRange.ymin, this.dataRange.ymax);
+			this.xLabels = this.api.formatLabels.call(this, this.xvalues);
+			this.yLabelPadding = this.showLabels
+				? this.fontSize * 1.25 + this.padding
+				: 0;
 
+
+			this.yvalues = this.api.calculateScaleParameters(this.dataRange.ymin, this.dataRange.ymax);
 			this.yLabels = this.api.formatLabels.call(this, this.yvalues);
 			this.xLabelPadding = this.showLabels
 				? helpers.longestText(this.chart.ctx, this.font, this.yLabels) + this.padding : 0;
@@ -195,7 +214,7 @@
 		},
 		calculateY: function (y, ease) {
 
-			return this.chart.height - ((y - this.dataRange.ymin) * this.chart.height / (this.dataRange.ymax - this.dataRange.ymin)) * (ease || 1);
+			return this.chart.height - this.yLabelPadding - ((y - this.dataRange.ymin) * (this.chart.height - this.yLabelPadding) / (this.dataRange.ymax - this.dataRange.ymin)) * (ease || 1);
 		},
 
 		draw: function () {
@@ -246,21 +265,15 @@
 					}
 				}, this);
 
-				// axis
-				ctx.lineWidth = this.lineWidth;
-				ctx.strokeStyle = this.lineColor;
-				ctx.beginPath();
-				ctx.moveTo(xpos1, 0);
-				ctx.lineTo(xpos1, ypos1);
-				ctx.stroke();
-
-
 				// x axis
-				helpers.each(this.xvalues, function (value) {
+				helpers.each(this.xvalues, function (value, index) {
 
 					var xpos = this.calculateX(value);
 
 					if (this.showVerticalLines) {
+
+						ctx.lineWidth = this.gridLineWidth;
+						ctx.strokeStyle = this.gridLineColor;
 
 						ctx.beginPath();
 						ctx.moveTo(xpos, ypos1);
@@ -268,8 +281,41 @@
 						ctx.stroke();
 					}
 
+					// labels
+					if (this.showLabels) {
+
+						ctx.lineWidth = this.lineWidth;
+						ctx.strokeStyle = this.lineColor;
+
+						// черточки
+						ctx.beginPath();
+						ctx.moveTo(xpos, ypos1);
+						ctx.lineTo(xpos, ypos1 + 5);
+						ctx.stroke();
+
+						// text
+						ctx.fillStyle = this.textColor;
+						ctx.font = this.font;
+						ctx.textAlign = "center";
+						ctx.textBaseline = "top";
+						ctx.fillText(this.xLabels[index], xpos, ypos1 + 7);
+					}
 				}, this);
 
+
+				// axis
+				ctx.lineWidth = this.lineWidth;
+				ctx.strokeStyle = this.lineColor;
+
+				ctx.beginPath();
+				ctx.moveTo(xpos1, 0);
+				ctx.lineTo(xpos1, ypos1);
+				ctx.stroke();
+
+				ctx.beginPath();
+				ctx.moveTo(xpos1, ypos1);
+				ctx.lineTo(xpos2, ypos1);
+				ctx.stroke();
 			}
 		}
 	});
