@@ -9,7 +9,7 @@
 	<script src="AltLineChart.js"></script>
 </head>
 <body>
-	<canvas id="myChart" width="480" height="220" style="border: 1px solid gray;"></canvas>
+	<canvas id="myChart" width="480" height="220"></canvas>
 
 	<script>
 
@@ -60,6 +60,7 @@
 		var myLineChart = new Chart(ctx).AltLineChart(data, {
 			bezierCurve: true,
 			showTooltips: false,
+			scaleShowHorizontalLines: false,
 			scaleShowLabels: true,
 			scaleLabel: "<%=value%>°C"
 		});

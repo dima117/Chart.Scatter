@@ -207,6 +207,8 @@
 				// y axis
 				var xpos1 = this.calculateX(this.dataRange.xmin);
 				var xpos2 = this.calculateX(this.dataRange.xmax);
+				var ypos1 = this.calculateY(this.dataRange.ymin);
+				var ypos2 = this.calculateY(this.dataRange.ymax);
 
 				helpers.each(this.yvalues, function (value, index) {
 
@@ -226,10 +228,10 @@
 					// labels
 					if (this.showLabels) {
 	
-						// черточки
 						ctx.lineWidth = this.lineWidth;
 						ctx.strokeStyle = this.lineColor;
 
+						// черточки
 						ctx.beginPath();
 						ctx.moveTo(xpos1, ypos);
 						ctx.lineTo(xpos1 - 5, ypos);
@@ -242,13 +244,18 @@
 						ctx.textBaseline = "middle";
 						ctx.fillText(this.yLabels[index], xpos1 - 7, ypos);
 					}
-
 				}, this);
 
-				// x axis
-				var ypos1 = this.calculateY(this.dataRange.ymin);
-				var ypos2 = this.calculateY(this.dataRange.ymax);
+				// axis
+				ctx.lineWidth = this.lineWidth;
+				ctx.strokeStyle = this.lineColor;
+				ctx.beginPath();
+				ctx.moveTo(xpos1, 0);
+				ctx.lineTo(xpos1, ypos1);
+				ctx.stroke();
 
+
+				// x axis
 				helpers.each(this.xvalues, function (value) {
 
 					var xpos = this.calculateX(value);
