@@ -18,6 +18,7 @@
 		// scaleLineWidth: 1,						// Number - Pixel width of the scale line
 		// scaleShowLabels: true,					// Boolean - Whether to show labels on the scale
 		// scaleLabel: "<%=value%>",				// Interpolated JS string - can access value
+		scaleArgLabel: "<%=value%>",				// Interpolated JS string - can access value
 
 
 		// SCALE
@@ -57,7 +58,6 @@
 		initialize: function () {
 
 			// this.dataRange - минимальные и максимальные значения данных
-			// this.display - нужно ли отображать шкалу
 
 			// инициализируем настройки
 			// рассчитываем вспомогательные параметры
@@ -65,16 +65,7 @@
 			this.font = helpers.fontString(this.scaleFontSize, this.scaleFontStyle, this.scaleFontFamily);
 		},
 
-		update: function (newProps) {
-			helpers.extend(this, newProps);
-			this.fit();
-		},
-
 		api: {
-
-			trunc: function (x) {
-				return x < 0 ? Math.ceil(x) : Math.floor(x);
-			},
 
 			getElementOrDefault: function (array, index, defaultValue) {
 
@@ -123,56 +114,44 @@
 				result.after.y = this.applyRange(result.after.y, range.ymin, range.ymax);
 
 				return result;
-			},
-
-			calculateScaleParameters: function (min, max) {
-
-				var range = max - min;
-				var step = 0.000000001;
-				while (range / step > 25) {
-
-					step *= 10;
-				}
-
-				var pos = (this.trunc(min / step) + 1) * step;
-				var end = this.trunc(max / step) * step;
-
-				var a = [];
-				while (pos <= end) {
-
-					a.push(pos);
-					pos += step;
-				}
-
-				return a;
-			},
-
-			formatLabels: function (values) {
-
-				var a = [];
-
-				for (var i = 0; i < values.length; i++) {
-
-					a.push(helpers.template(this.labelTemplate, { value: values[i] }));
-				}
-
-				return a;
 			}
 		},
 
 		fit: function () {
 
 			// рассчитываем параметры отображения
-			this.xvalues = this.api.calculateScaleParameters(this.dataRange.xmin, this.dataRange.xmax);
-			this.xLabels = this.api.formatLabels.call(this, this.xvalues);
-			this.yLabelPadding = this.showLabels
+			this.xScaleRange = helpers.calculateScaleRange(
+				[this.dataRange.xmin, this.dataRange.xmax],
+				this.chart.width,
+				this.fontSize,
+				this.beginAtZero,
+				this.integersOnly);
+
+			this.xLabels = helpers.generateLabels(
+				this.argLabelTemplate,
+				this.xScaleRange.steps,
+				this.xScaleRange.min,
+				this.xScaleRange.stepValue);
+
+			this.yPadding = this.showLabels
 				? this.fontSize * 1.25 + this.padding
 				: 0;
 
 
-			this.yvalues = this.api.calculateScaleParameters(this.dataRange.ymin, this.dataRange.ymax);
-			this.yLabels = this.api.formatLabels.call(this, this.yvalues);
-			this.xLabelPadding = this.showLabels
+			this.yScaleRange = helpers.calculateScaleRange(
+				[this.dataRange.ymin, this.dataRange.ymax],
+				this.chart.height,
+				this.fontSize,
+				this.beginAtZero,
+				this.integersOnly);
+
+			this.yLabels = helpers.generateLabels(
+				this.labelTemplate,
+				this.yScaleRange.steps,
+				this.yScaleRange.min,
+				this.yScaleRange.stepValue);
+
+			this.xPadding = this.showLabels
 				? helpers.longestText(this.chart.ctx, this.font, this.yLabels) + this.padding : 0;
 		},
 
@@ -210,26 +189,28 @@
 
 		calculateX: function (x) {
 
-			return this.xLabelPadding + ((x - this.dataRange.xmin) * (this.chart.width - this.xLabelPadding) / (this.dataRange.xmax - this.dataRange.xmin));
+			return this.xPadding + ((x - this.xScaleRange.min) * (this.chart.width - this.xPadding) / (this.xScaleRange.max - this.xScaleRange.min));
 		},
 		calculateY: function (y, ease) {
 
-			return this.chart.height - this.yLabelPadding - ((y - this.dataRange.ymin) * (this.chart.height - this.yLabelPadding) / (this.dataRange.ymax - this.dataRange.ymin)) * (ease || 1);
+			return this.chart.height - this.yPadding - ((y - this.yScaleRange.min) * (this.chart.height - this.yPadding) / (this.yScaleRange.max - this.yScaleRange.min)) * (ease || 1);
 		},
 
 		draw: function () {
 
-			var ctx = this.chart.ctx;
+			var ctx = this.chart.ctx, value, index;
 
 			if (this.display) {
 
-				// y axis
-				var xpos1 = this.calculateX(this.dataRange.xmin);
-				var xpos2 = this.calculateX(this.dataRange.xmax);
-				var ypos1 = this.calculateY(this.dataRange.ymin);
-				var ypos2 = this.calculateY(this.dataRange.ymax);
+				var xpos1 = this.calculateX(this.xScaleRange.min);
+				var xpos2 = this.calculateX(this.xScaleRange.max);
+				var ypos1 = this.calculateY(this.yScaleRange.min);
+				var ypos2 = this.calculateY(this.yScaleRange.max);
 
-				helpers.each(this.yvalues, function (value, index) {
+				// y axis
+				for (index = 0, value = this.yScaleRange.min;
+					 index < this.yScaleRange.steps;
+					 index++, value += this.yScaleRange.stepValue) {
 
 					var ypos = this.calculateY(value);
 
@@ -246,7 +227,7 @@
 
 					// labels
 					if (this.showLabels) {
-	
+
 						ctx.lineWidth = this.lineWidth;
 						ctx.strokeStyle = this.lineColor;
 
@@ -263,10 +244,12 @@
 						ctx.textBaseline = "middle";
 						ctx.fillText(this.yLabels[index], xpos1 - 7, ypos);
 					}
-				}, this);
+				}
 
 				// x axis
-				helpers.each(this.xvalues, function (value, index) {
+				for (index = 0, value = this.xScaleRange.min;
+					 index < this.xScaleRange.steps;
+					 index++, value += this.xScaleRange.stepValue) {
 
 					var xpos = this.calculateX(value);
 
@@ -300,9 +283,8 @@
 						ctx.textBaseline = "top";
 						ctx.fillText(this.xLabels[index], xpos, ypos1 + 7);
 					}
-				}, this);
-
-
+				}
+				
 				// axis
 				ctx.lineWidth = this.lineWidth;
 				ctx.strokeStyle = this.lineColor;
@@ -409,7 +391,10 @@
 				fontFamily: this.options.scaleFontFamily,
 
 				labelTemplate: this.options.scaleLabel,
+				argLabelTemplate: this.options.scaleArgLabel,
 				showLabels: this.options.scaleShowLabels,
+				beginAtZero : this.options.scaleBeginAtZero,
+				integersOnly : this.options.scaleIntegersOnly,
 
 				gridLineWidth: (this.options.scaleShowGridLines) ? this.options.scaleGridLineWidth : 0,
 				gridLineColor: (this.options.scaleShowGridLines) ? this.options.scaleGridLineColor : "rgba(0,0,0,0)",

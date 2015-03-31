@@ -60,9 +60,10 @@
 		var myLineChart = new Chart(ctx).AltLineChart(data, {
 			bezierCurve: true,
 			showTooltips: false,
-			scaleShowHorizontalLines: false,
+			scaleShowHorizontalLines: true,
 			scaleShowLabels: true,
-			scaleLabel: "<%=value%>°C"
+			scaleLabel: "<%=value%>°C",
+			scaleArgLabel: "<%=value%>mm"
 		});
 
 	</script>
