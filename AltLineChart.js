@@ -119,25 +119,7 @@
 
 		fit: function () {
 
-			// рассчитываем параметры отображения
-			this.xScaleRange = helpers.calculateScaleRange(
-				[this.dataRange.xmin, this.dataRange.xmax],
-				this.chart.width,
-				this.fontSize,
-				this.beginAtZero,
-				this.integersOnly);
-
-			this.xLabels = helpers.generateLabels(
-				this.argLabelTemplate,
-				this.xScaleRange.steps,
-				this.xScaleRange.min,
-				this.xScaleRange.stepValue);
-
-			this.yPadding = this.showLabels
-				? this.fontSize * 1.25 + this.padding
-				: 0;
-
-
+			// vertical labels & padding
 			this.yScaleRange = helpers.calculateScaleRange(
 				[this.dataRange.ymin, this.dataRange.ymax],
 				this.chart.height,
@@ -153,6 +135,30 @@
 
 			this.xPadding = this.showLabels
 				? helpers.longestText(this.chart.ctx, this.font, this.yLabels) + this.padding : 0;
+
+			// horisontal labels & padding
+			this.xScaleRange = helpers.calculateScaleRange(
+				[this.dataRange.xmin, this.dataRange.xmax],
+				this.chart.width,
+				this.fontSize,
+				this.beginAtZero,
+				this.integersOnly);
+
+			this.xLabels = helpers.generateLabels(
+				this.argLabelTemplate,
+				this.xScaleRange.steps,
+				this.xScaleRange.min,
+				this.xScaleRange.stepValue);
+
+			var xStepWidth = Math.floor((this.chart.width - this.xPadding) / this.xScaleRange.steps);
+			var xLabelMaxWidth = helpers.longestText(this.chart.ctx, this.font, this.xLabels);
+			var xLabelHeight = this.fontSize * 1.5;
+
+			this.xLabelRotation = xLabelMaxWidth > xStepWidth;
+
+			this.yPadding = this.showLabels
+				? (this.xLabelRotation ? xLabelMaxWidth : xLabelHeight) + this.padding
+				: 0;
 		},
 
 		updateBezierControlPoints: function (dataSetPoints, ease, tension) {
@@ -277,11 +283,16 @@
 						ctx.stroke();
 
 						// text
-						ctx.fillStyle = this.textColor;
 						ctx.font = this.font;
-						ctx.textAlign = "center";
-						ctx.textBaseline = "top";
-						ctx.fillText(this.xLabels[index], xpos, ypos1 + 7);
+						ctx.fillStyle = this.textColor;
+
+						ctx.save();
+						ctx.translate(xpos, ypos1 + 7);
+						ctx.rotate(this.xLabelRotation ?  -Math.PI / 2 : 0);
+						ctx.textAlign = (this.xLabelRotation) ? "right" : "center";
+						ctx.textBaseline = (this.xLabelRotation) ? "middle" : "top";
+						ctx.fillText(this.xLabels[index], 0, 0);
+						ctx.restore();
 					}
 				}
 				
