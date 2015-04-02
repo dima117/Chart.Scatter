@@ -20,7 +20,6 @@
 		// scaleLabel: "<%=value%>",				// Interpolated JS string - can access value
 		scaleArgLabel: "<%=value%>",				// Interpolated JS string - can access value
 
-
 		// SCALE
 		scaleShowGridLines: true,				//Boolean - Whether grid lines are shown across the chart
 		scaleGridLineWidth: 1,					//Number - Width of the grid lines
@@ -47,8 +46,8 @@
 		pointHitDetectionRadius: 4,		// Number - amount extra to add to the radius to cater for hit detection outside the drawn point
 
 
-		multiTooltipTemplate: "<%= label %>",
-		tooltipTemplate: "<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%= value.y %>"
+		multiTooltipTemplate: "<%=arg%> - <%=value%>",
+		tooltipTemplate: "<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%=arg%> - <%=value%>"
 	};
 
 	chartjs.AltScale = chartjs.Element.extend({
@@ -86,12 +85,12 @@
 				var tensionBefore = !!prev ? tension : 0;
 				var tensionAfter = !!next ? tension : 0;
 
-				var innerCurrent = current.value;
-				var innerPrev = prev ? prev.value : current.value;
-				var innerNext = next ? next.value : current.value;
+				var innerCurrent = current;
+				var innerPrev = prev ? prev : current;
+				var innerNext = next ? next : current;
 
-				var a = { xx: innerCurrent.x - innerPrev.x, yy: innerCurrent.y - innerPrev.y }
-				var b = { xx: innerNext.x - innerPrev.x, yy: innerNext.y - innerPrev.y }
+				var a = { xx: innerCurrent.arg - innerPrev.arg, yy: innerCurrent.value - innerPrev.value }
+				var b = { xx: innerNext.arg - innerPrev.arg, yy: innerNext.value - innerPrev.value }
 
 				var mul = a.xx * b.xx + a.yy * b.yy;
 				var mod = Math.sqrt(b.xx * b.xx + b.yy * b.yy);
@@ -100,12 +99,12 @@
 
 				var result = {
 					before: {
-						x: innerCurrent.x - b.xx * k * tensionBefore,
-						y: innerCurrent.y - b.yy * k * tensionBefore
+						x: innerCurrent.arg - b.xx * k * tensionBefore,
+						y: innerCurrent.value - b.yy * k * tensionBefore
 					},
 					after: {
-						x: innerCurrent.x + b.xx * (1 - k) * tensionAfter,
-						y: innerCurrent.y + b.yy * (1 - k) * tensionAfter
+						x: innerCurrent.arg + b.xx * (1 - k) * tensionAfter,
+						y: innerCurrent.value + b.yy * (1 - k) * tensionAfter
 					}
 				};
 
@@ -188,8 +187,8 @@
 
 				var current = dataSetPoints[i];
 
-				current.x = this.calculateX(current.value.x);
-				current.y = this.calculateY(current.value.y, ease);
+				current.x = this.calculateX(current.arg);
+				current.y = this.calculateY(current.value, ease);
 			}
 		},
 
@@ -319,9 +318,6 @@
 
 		initialize: function (datasets) {
 
-			//this.chart.ctx // The drawing context for this chart
-			//this.chart.canvas // the canvas node for this chart
-
 			this.AltPointClass = chartjs.Point.extend({
 				radius: this.options.pointDotRadius,
 				hitDetectionRadius: this.options.pointHitDetectionRadius,
@@ -347,9 +343,9 @@
 
 					//Add a new point for each piece of data, passing any required data to draw.
 					datasetObject.points.push(new this.AltPointClass({
-						value: dataPoint,
-						label: dataPoint.y,
-						datasetLabel: dataset.label,
+						arg: dataPoint.x,
+						value: dataPoint.y,
+						datasetLabel: dataset.label || null,
 						strokeColor: 'white',
 						fillColor: dataset.strokeColor,
 						highlightStroke: dataset.strokeColor,
@@ -527,26 +523,24 @@
 
 			this._forEachPoint(function (point) {
 
-				var value = point.value;
-
 				// min x
-				if (xmin === undefined || value.x < xmin) {
-					xmin = value.x;
+				if (xmin === undefined || point.arg < xmin) {
+					xmin = point.arg;
 				}
 
 				// max x
-				if (xmax === undefined || value.x > xmax) {
-					xmax = value.x;
+				if (xmax === undefined || point.arg > xmax) {
+					xmax = point.arg;
 				}
 
 				// min y
-				if (ymin === undefined || value.y < ymin) {
-					ymin = value.y;
+				if (ymin === undefined || point.value < ymin) {
+					ymin = point.value;
 				}
 
 				// max y
-				if (ymax === undefined || value.y > ymax) {
-					ymax = value.y;
+				if (ymax === undefined || point.value > ymax) {
+					ymax = point.value;
 				}
 			});
 

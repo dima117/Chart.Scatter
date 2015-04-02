@@ -10,7 +10,7 @@
 8. draw options
 9. ~~animation~~
 10. documentation
-11. change point data structure
+11. ~~change point data structure~~
 12. override scale + scaleBeginAtZero
 13. ~~calc scale step~~
  
