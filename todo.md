@@ -2,7 +2,7 @@
 
 1. ~~bezier curves~~
 2. ~~points~~
-3. ~~hover state &  tooltip~~ *+ refactoring*
+3. ~~hover state &  tooltip *+ refactoring*~~
 4. ~~number scale *+ refactoring*~~
 5. ~~margin & padding~~
 6. date scale

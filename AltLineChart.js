@@ -46,8 +46,8 @@
 		pointHitDetectionRadius: 4,		// Number - amount extra to add to the radius to cater for hit detection outside the drawn point
 
 
-		multiTooltipTemplate: "<%=arg%> - <%=value%>",
-		tooltipTemplate: "<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%=arg%> - <%=value%>"
+		multiTooltipTemplate: "<%=arg%>; <%=value%>",
+		tooltipTemplate: "<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%=arg%>; <%=value%>"
 	};
 
 	chartjs.AltScale = chartjs.Element.extend({
@@ -61,7 +61,7 @@
 			// инициализируем настройки
 			// рассчитываем вспомогательные параметры
 
-			this.font = helpers.fontString(this.scaleFontSize, this.scaleFontStyle, this.scaleFontFamily);
+			this.font = helpers.fontString(this.fontSize, this.fontStyle, this.fontFamily);
 		},
 
 		api: {
@@ -243,10 +243,10 @@
 						ctx.stroke();
 
 						// text
-						ctx.fillStyle = this.textColor;
-						ctx.font = this.font;
 						ctx.textAlign = "right";
 						ctx.textBaseline = "middle";
+						ctx.font = this.font;
+						ctx.fillStyle = this.textColor;
 						ctx.fillText(this.yLabels[index], xpos1 - 7, ypos);
 					}
 				}
@@ -282,14 +282,13 @@
 						ctx.stroke();
 
 						// text
-						ctx.font = this.font;
-						ctx.fillStyle = this.textColor;
-
 						ctx.save();
 						ctx.translate(xpos, ypos1 + 7);
 						ctx.rotate(this.xLabelRotation ?  -Math.PI / 2 : 0);
 						ctx.textAlign = (this.xLabelRotation) ? "right" : "center";
 						ctx.textBaseline = (this.xLabelRotation) ? "middle" : "top";
+						ctx.font = this.font;
+						ctx.fillStyle = this.textColor;
 						ctx.fillText(this.xLabels[index], 0, 0);
 						ctx.restore();
 					}
@@ -364,15 +363,13 @@
 
 					var activePoints = (evt.type !== 'mouseout') ? this.getPointsAtEvent(evt) : [];
 
-					helpers.each(this.datasets, function (dataset) {
+					this._forEachPoint(function(point) {
 
-						helpers.each(dataset.points, function (point) {
-
-							point.restore(['fillColor', 'strokeColor']);
-						});
+						point.restore(['fillColor', 'strokeColor']);
 					});
 
 					helpers.each(activePoints, function (activePoint) {
+
 						activePoint.fillColor = activePoint.highlightFill;
 						activePoint.strokeColor = activePoint.highlightStroke;
 					});
@@ -438,8 +435,6 @@
 
 				if (elements.length == 1) {
 
-
-
 					new chartjs.Tooltip({
 						x: Math.round(tooltipPosition.x),
 						y: Math.round(tooltipPosition.y),
@@ -498,6 +493,7 @@
 					}).draw();
 				}
 			}
+
 			return this;
 		},
 
