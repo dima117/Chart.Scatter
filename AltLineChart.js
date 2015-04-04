@@ -52,8 +52,6 @@
 
 	chartjs.AltScale = chartjs.Element.extend({
 
-		padding: 10,
-
 		initialize: function () {
 
 			// this.dataRange - минимальные и максимальные значения данных
@@ -62,6 +60,7 @@
 			// рассчитываем вспомогательные параметры
 
 			this.font = helpers.fontString(this.fontSize, this.fontStyle, this.fontFamily);
+			this.padding = this.fontSize * 1.5;
 		},
 
 		api: {
@@ -239,7 +238,7 @@
 						// черточки
 						ctx.beginPath();
 						ctx.moveTo(xpos1, ypos);
-						ctx.lineTo(xpos1 - 5, ypos);
+						ctx.lineTo(xpos1 - (this.padding / 3), ypos);
 						ctx.stroke();
 
 						// text
@@ -247,7 +246,7 @@
 						ctx.textBaseline = "middle";
 						ctx.font = this.font;
 						ctx.fillStyle = this.textColor;
-						ctx.fillText(this.yLabels[index], xpos1 - 7, ypos);
+						ctx.fillText(this.yLabels[index], xpos1 - (this.padding / 2), ypos);
 					}
 				}
 
@@ -278,12 +277,12 @@
 						// черточки
 						ctx.beginPath();
 						ctx.moveTo(xpos, ypos1);
-						ctx.lineTo(xpos, ypos1 + 5);
+						ctx.lineTo(xpos, ypos1 + (this.padding / 3));
 						ctx.stroke();
 
 						// text
 						ctx.save();
-						ctx.translate(xpos, ypos1 + 7);
+						ctx.translate(xpos, ypos1 + (this.padding / 2));
 						ctx.rotate(this.xLabelRotation ?  -Math.PI / 2 : 0);
 						ctx.textAlign = (this.xLabelRotation) ? "right" : "center";
 						ctx.textBaseline = (this.xLabelRotation) ? "middle" : "top";
