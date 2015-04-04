@@ -2,13 +2,15 @@
 
 *Alternative line chart plugin for Chart.js* [chartjs.org](http://www.chartjs.org)
 
+[Live demo](http://jsfiddle.net/dima117a/3gertrmr/7)
+
 ## Documentation
 
 You can find the documentation under `/docs`
 
 ## License
 
-Chart.StackedBar.js is available under the [MIT license](http://opensource.org/licenses/MIT).
+AltLineChart.js is available under the [MIT license](http://opensource.org/licenses/MIT).
 
 ## Bugs & issues
 
