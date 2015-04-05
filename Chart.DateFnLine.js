@@ -2,7 +2,28 @@
 	"use strict";
 
 	var chartjs = this,
-		helpers = chartjs.helpers;
+		helpers = chartjs.helpers,
+		hlp = {
+			
+			formatDate: function(date) {
+
+				date = new Date(+date);
+				var norm = new Date(+date + date.getTimezoneOffset() * 3600000);
+
+				var hasTime = norm.getHours() +
+					norm.getMinutes() +
+					norm.getSeconds() +
+					norm.getMilliseconds();
+
+				if (hasTime) {
+
+					return norm.toLocaleTimeString();
+				} else {
+					
+					return norm.toLocaleDateString();
+				}
+			}
+		};
 
 	chartjs.DateFnScale = chartjs.FnScale.extend({
 
@@ -51,7 +72,7 @@
 			var maxSteps = drawingSize / (fontSize * mul);
 
 			var valueRange = +valueMax - valueMin,
-				offset = new Date(+valueMin).getTimezoneOffset() * 60000,
+				offset = 0,// new Date(+valueMin).getTimezoneOffset() * 60000,
 				min = +valueMin + offset,
 				max = +valueMax + offset;
 
@@ -95,7 +116,7 @@
 				var value = graphMin + stepValue * index;
 
 
-				labelsArray[index] = new Date(value).toLocaleTimeString();
+				labelsArray[index] = hlp.formatDate(value);
 			});
 
 			this.xLabels = labelsArray;
