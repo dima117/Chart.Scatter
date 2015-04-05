@@ -6,7 +6,8 @@
 
 	<title>title</title>
 	<script src="Chart.js"></script>
-	<script src="AltLineChart.js"></script>
+	<script src="Chart.FnLine.js"></script>
+	<script src="Chart.DateFnLine.js"></script>
 </head>
 <body>
 	<canvas id="myChartWithDates" width="480" height="220"></canvas>
@@ -58,7 +59,7 @@
 		Chart.defaults.global.responsive = true;
 		//Chart.defaults.global.animation = false;
 		var ctx = document.getElementById("myChart").getContext("2d");
-		var myLineChart = new Chart(ctx).AltLineChart(data, {
+		var myLineChart = new Chart(ctx).FnLine(data, {
 			bezierCurve: true,
 			showTooltips: true,
 			scaleShowHorizontalLines: true,
@@ -100,7 +101,7 @@
 			}];
 
 		var ctx2 = document.getElementById("myChartWithDates").getContext("2d");
-		var myDateLineChart = new Chart(ctx2).AltLineChart(data2, {
+		var myDateLineChart = new Chart(ctx2).DateFnLine(data2, {
 			bezierCurve: true,
 			showTooltips: true,
 			scaleShowHorizontalLines: true,

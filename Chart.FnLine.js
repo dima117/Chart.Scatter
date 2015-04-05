@@ -50,7 +50,7 @@
 		tooltipTemplate: "<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%=arg%>; <%=value%>"
 	};
 
-	chartjs.AltScale = chartjs.Element.extend({
+	chartjs.FnScale = chartjs.Element.extend({
 
 		initialize: function () {
 
@@ -311,12 +311,12 @@
 	});
 
 	chartjs.Type.extend({
-		name: "AltLineChart",
+		name: "FnLine",
 		defaults: defaultConfig,
 
 		initialize: function (datasets) {
 
-			this.AltPointClass = chartjs.Point.extend({
+			this.FnPointClass = chartjs.Point.extend({
 				radius: this.options.pointDotRadius,
 				hitDetectionRadius: this.options.pointHitDetectionRadius,
 				strokeWidth: this.options.pointDotStrokeWidth,
@@ -340,7 +340,7 @@
 				helpers.each(dataset.data, function (dataPoint) {
 
 					//Add a new point for each piece of data, passing any required data to draw.
-					datasetObject.points.push(new this.AltPointClass({
+					datasetObject.points.push(new this.FnPointClass({
 						arg: dataPoint.x,
 						value: dataPoint.y,
 						datasetLabel: dataset.label || null,
@@ -408,7 +408,7 @@
 				display: this.options.showScale
 			};
 
-			this.scale = new chartjs.AltScale(scaleOptions);
+			this.scale = new chartjs.FnScale(scaleOptions);
 		},
 
 		// helpers

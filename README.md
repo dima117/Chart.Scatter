@@ -1,4 +1,4 @@
-#Chart.AltLineChart
+#Chart.FnLine
 
 *Alternative line chart plugin for Chart.js* [chartjs.org](http://www.chartjs.org)
 
@@ -10,7 +10,7 @@ You can find the documentation under `/docs`
 
 ## License
 
-AltLineChart.js is available under the [MIT license](http://opensource.org/licenses/MIT).
+Chart.FnLine.js is available under the [MIT license](http://opensource.org/licenses/MIT).
 
 ## Bugs & issues
 
