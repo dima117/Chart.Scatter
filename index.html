@@ -9,6 +9,7 @@
 	<script src="AltLineChart.js"></script>
 </head>
 <body>
+	<canvas id="myChartWithDates" width="480" height="220"></canvas>
 	<canvas id="myChart" width="480" height="220" style="border: 1px dashed gray"></canvas>
 
 	<script>
@@ -64,6 +65,47 @@
 			scaleShowLabels: true,
 			scaleLabel: "<%=value%>°C",
 			scaleArgLabel: "<%=value%>mmm"
+		});
+
+		var data2 = [
+			{
+				label: 'temperature',
+				strokeColor: '#A31515',
+				data: [
+					{
+						x: new Date('2011-04-11T11:45:00'),
+						y: 25
+					},
+					{
+						x: new Date('2011-04-11T12:51:00'),
+						y: 28
+					},
+					{
+						x: new Date('2011-04-11T14:10:00'),
+						y: 22
+					},
+					{
+						x: new Date('2011-04-12T11:15:00'),
+						y: 18
+					},
+					{
+						x: new Date('2011-04-12T13:00:00'),
+						y: 25
+					},
+					{
+						x: new Date('2011-04-12T16:51:00'),
+						y: 24
+					}
+				]
+			}];
+
+		var ctx2 = document.getElementById("myChartWithDates").getContext("2d");
+		var myDateLineChart = new Chart(ctx2).AltLineChart(data2, {
+			bezierCurve: true,
+			showTooltips: true,
+			scaleShowHorizontalLines: true,
+			scaleShowLabels: true,
+			scaleLabel: "<%=value%>°C"
 		});
 
 	</script>
