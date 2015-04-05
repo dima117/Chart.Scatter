@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<title></title>
+</head>
+<body>
+	<div>
+		<label>min</label>
+		<input id="min" value="1428224701378" />
+	</div>
+	<div>
+		<label>max</label>
+		<input id="max" value="1428483926920" />
+	</div>
+	<div>
+		<label>width</label>
+		<input id="width" value="320" />
+	</div>
+	<div>
+		<label>font size</label>
+		<input id="fontSize" value="12" />
+	</div>
+
+	<a href="#" onclick=" return go() ">push me</a>
+
+	<div id="result" style="margin-top: 42px; border-top: 1px dashed gray;">
+
+
+	</div>
+
+	<script>
+
+		function go() {
+
+			var min = document.getElementById("min").value;
+			var max = document.getElementById("max").value;
+			var width = document.getElementById("width").value;
+			var fontSize = document.getElementById("fontSize").value;
+
+			var result = calc(min, max, width, fontSize);
+
+			var resultPanel = document.getElementById("result");
+
+			resultPanel.innerHTML = new Date(+result.start).toLocaleString() + " - " + result.stepValue / 3600000 + "h - " + result.stepCount;
+
+			var ul = document.createElement("ul");
+
+			for (var i = 0; i < result.stepCount; i++) {
+
+				var date = +result.start + (result.stepValue * i);
+				var label = new Date(date).toLocaleString();
+				var li = document.createElement("li");
+				li.innerText = label;
+				ul.appendChild(li);
+			}
+
+			resultPanel.appendChild(ul);
+
+			return false;
+		}
+
+		function getElementOrDefault(array, index, defaultValue) {
+
+			return index >= 0 && index < array.length ? array[index] : defaultValue;
+		}
+
+		function calc(valueMin, valueMax, drawingSize, fontSize) {
+
+			var x = [1, 10, 10, 10, 60, 60, 24, 7];
+			var y = [1, 2, 5];
+
+			var v = 1, a = [];
+
+			for (var xp = 0; xp < x.length; xp++) {
+
+				v = v * x[xp];
+
+				for (var yp = 0; yp < y.length; yp++) {
+					
+					a.push(new Date(v * y[yp]));
+					a.push('\n');
+				}
+			}
+
+			alert(a);
+
+			var mul = 2;
+
+			var minSteps = 2;
+			var maxSteps = drawingSize / (fontSize * mul);
+
+			var start = valueMin,
+				stepValue = valueMax - valueMin,
+				stepCount = 2;
+
+			return {
+				start: start,
+				stepValue: stepValue,
+				stepCount: stepCount
+			};
+		}
+
+	</script>
+
+</body>
+</html>
