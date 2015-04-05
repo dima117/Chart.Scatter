@@ -115,38 +115,56 @@
 			}
 		},
 
-		fit: function () {
+		calculateYscaleRange: function () {
 
-			// vertical labels & padding
 			this.yScaleRange = helpers.calculateScaleRange(
 				[this.dataRange.ymin, this.dataRange.ymax],
 				this.chart.height,
 				this.fontSize,
-				this.beginAtZero,
-				this.integersOnly);
+				this.beginAtZero,	// beginAtZero,
+				this.integersOnly); // integersOnly
+		},
 
+		calculateXscaleRange: function () {
+
+			this.xScaleRange = helpers.calculateScaleRange(
+				[this.dataRange.xmin, this.dataRange.xmax],
+				this.chart.width,
+				this.fontSize,
+				false,	// beginAtZero,
+				false); // integersOnly
+		},
+
+		generateYLabels: function() {
+			
 			this.yLabels = helpers.generateLabels(
 				this.labelTemplate,
 				this.yScaleRange.steps,
 				this.yScaleRange.min,
 				this.yScaleRange.stepValue);
+		},
 
-			this.xPadding = this.showLabels
-				? helpers.longestText(this.chart.ctx, this.font, this.yLabels) + this.padding : 0;
-
-			// horisontal labels & padding
-			this.xScaleRange = helpers.calculateScaleRange(
-				[this.dataRange.xmin, this.dataRange.xmax],
-				this.chart.width,
-				this.fontSize,
-				this.beginAtZero,
-				this.integersOnly);
-
+		generateXLabels: function() {
+			
 			this.xLabels = helpers.generateLabels(
 				this.argLabelTemplate,
 				this.xScaleRange.steps,
 				this.xScaleRange.min,
 				this.xScaleRange.stepValue);
+		},
+
+		fit: function () {
+
+			// vertical labels & padding
+			this.calculateYscaleRange();
+			this.generateYLabels();
+
+			this.xPadding = this.showLabels
+				? helpers.longestText(this.chart.ctx, this.font, this.yLabels) + this.padding : 0;
+
+			// horisontal labels & padding
+			this.calculateXscaleRange();
+			this.generateXLabels();
 
 			var xStepWidth = Math.floor((this.chart.width - this.xPadding) / this.xScaleRange.steps);
 			var xLabelMaxWidth = helpers.longestText(this.chart.ctx, this.font, this.xLabels);
@@ -283,7 +301,7 @@
 						// text
 						ctx.save();
 						ctx.translate(xpos, ypos1 + (this.padding / 2));
-						ctx.rotate(this.xLabelRotation ?  -Math.PI / 2 : 0);
+						ctx.rotate(this.xLabelRotation ? -Math.PI / 2 : 0);
 						ctx.textAlign = (this.xLabelRotation) ? "right" : "center";
 						ctx.textBaseline = (this.xLabelRotation) ? "middle" : "top";
 						ctx.font = this.font;
@@ -292,7 +310,7 @@
 						ctx.restore();
 					}
 				}
-				
+
 				// axis
 				ctx.lineWidth = this.lineWidth;
 				ctx.strokeStyle = this.lineColor;
@@ -313,6 +331,8 @@
 	chartjs.Type.extend({
 		name: "FnLine",
 		defaults: defaultConfig,
+
+		scaleClass: chartjs.FnScale,
 
 		initialize: function (datasets) {
 
@@ -341,8 +361,8 @@
 
 					//Add a new point for each piece of data, passing any required data to draw.
 					datasetObject.points.push(new this.FnPointClass({
-						arg: dataPoint.x,
-						value: dataPoint.y,
+						arg: +dataPoint.x,
+						value: +dataPoint.y,
 						datasetLabel: dataset.label || null,
 						strokeColor: 'white',
 						fillColor: dataset.strokeColor,
@@ -362,7 +382,7 @@
 
 					var activePoints = (evt.type !== 'mouseout') ? this.getPointsAtEvent(evt) : [];
 
-					this._forEachPoint(function(point) {
+					this._forEachPoint(function (point) {
 
 						point.restore(['fillColor', 'strokeColor']);
 					});
@@ -396,8 +416,8 @@
 				labelTemplate: this.options.scaleLabel,
 				argLabelTemplate: this.options.scaleArgLabel,
 				showLabels: this.options.scaleShowLabels,
-				beginAtZero : this.options.scaleBeginAtZero,
-				integersOnly : this.options.scaleIntegersOnly,
+				beginAtZero: this.options.scaleBeginAtZero,
+				integersOnly: this.options.scaleIntegersOnly,
 
 				gridLineWidth: (this.options.scaleShowGridLines) ? this.options.scaleGridLineWidth : 0,
 				gridLineColor: (this.options.scaleShowGridLines) ? this.options.scaleGridLineColor : "rgba(0,0,0,0)",
@@ -408,7 +428,7 @@
 				display: this.options.showScale
 			};
 
-			this.scale = new chartjs.FnScale(scaleOptions);
+			this.scale = new this.scaleClass(scaleOptions);
 		},
 
 		// helpers
