@@ -8,6 +8,7 @@
 			formatDate: function(date) {
 
 				date = new Date(+date);
+
 				var norm = new Date(+date + date.getTimezoneOffset() * 3600000);
 
 				var hasTime = norm.getHours() +
@@ -66,10 +67,7 @@
 				{ u: 86400000, c: 5, t: 432000000, n: 'd' },
 				{ u: 604800000, c: 1, t: 604800000, n: 'w' }];
 
-			var mul = 2;
-
-			var minSteps = 2;
-			var maxSteps = drawingSize / (fontSize * mul);
+			var maxSteps = drawingSize / (fontSize * 2);
 
 			var valueRange = +valueMax - valueMin,
 				offset = 0,// new Date(+valueMin).getTimezoneOffset() * 60000,
@@ -131,7 +129,11 @@
 		//	Chart.types.Line.prototype.initialize.apply(this, arguments);
 		//}
 
-		scaleClass: chartjs.DateFnScale
+		scaleClass: chartjs.DateFnScale,
+		formatLabelX: function(arg) {
+
+			return hlp.formatDate(arg);
+		}
 	});
 
 

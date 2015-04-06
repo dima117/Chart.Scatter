@@ -46,8 +46,8 @@
 		pointHitDetectionRadius: 4,		// Number - amount extra to add to the radius to cater for hit detection outside the drawn point
 
 
-		multiTooltipTemplate: "<%=arg%>; <%=value%>",
-		tooltipTemplate: "<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%=arg%>; <%=value%>"
+		multiTooltipTemplate: "<%=argLabel%>; <%=valueLabel%>",
+		tooltipTemplate: "<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%=argLabel%>; <%=valueLabel%>"
 	};
 
 	chartjs.FnScale = chartjs.Element.extend({
@@ -112,6 +112,20 @@
 				result.after.y = this.applyRange(result.after.y, range.ymin, range.ymax);
 
 				return result;
+			},
+
+			generateLabels: function (templateString, numberOfSteps, graphMin, stepValue) {
+
+				var labelsArray = new Array(numberOfSteps);
+				if (templateString) {
+
+					helpers.each(labelsArray, function (val, index) {
+
+						labelsArray[index] = helpers.template(templateString, { value: (graphMin + (stepValue * (index))) });
+
+					});
+				}
+				return labelsArray;
 			}
 		},
 
@@ -135,18 +149,18 @@
 				true); // integersOnly
 		},
 
-		generateYLabels: function() {
-			
-			this.yLabels = helpers.generateLabels(
+		generateYLabels: function () {
+
+			this.yLabels = this.api.generateLabels(
 				this.labelTemplate,
 				this.yScaleRange.steps,
 				this.yScaleRange.min,
 				this.yScaleRange.stepValue);
 		},
 
-		generateXLabels: function() {
-			
-			this.xLabels = helpers.generateLabels(
+		generateXLabels: function () {
+
+			this.xLabels = this.api.generateLabels(
 				this.argLabelTemplate,
 				this.xScaleRange.steps,
 				this.xScaleRange.min,
@@ -355,6 +369,8 @@
 					datasetObject.points.push(new chartjs.Point({
 
 						ctx: this.chart.ctx,
+						argLabel: this.formatLabelX(+dataPoint.x),
+						valueLabel: this.formatLabelY(+dataPoint.y),
 
 						arg: +dataPoint.x,
 						value: +dataPoint.y,
@@ -401,6 +417,16 @@
 			}
 
 			this.render();
+		},
+
+		formatLabelX: function (arg) {
+
+			return helpers.template(this.options.scaleArgLabel, { value: arg });
+		},
+
+		formatLabelY: function (value) {
+
+			return helpers.template(this.options.scaleLabel, { value: value });
 		},
 
 		buildScale: function () {
