@@ -132,7 +132,7 @@
 				this.chart.width,
 				this.fontSize,
 				false,	// beginAtZero,
-				false); // integersOnly
+				true); // integersOnly
 		},
 
 		generateYLabels: function() {
@@ -336,14 +336,6 @@
 
 		initialize: function (datasets) {
 
-			this.FnPointClass = chartjs.Point.extend({
-				radius: this.options.pointDotRadius,
-				hitDetectionRadius: this.options.pointHitDetectionRadius,
-				strokeWidth: this.options.pointDotStrokeWidth,
-				display: this.options.pointDot,
-				ctx: this.chart.ctx
-			});
-
 			this.datasets = [];
 
 			//Iterate through each of the datasets, and build this into a property of the chart
@@ -351,7 +343,7 @@
 
 				var datasetObject = {
 					label: dataset.label || null,
-					strokeColor: dataset.strokeColor,
+					strokeColor: dataset.strokeColor || this.options.datasetStrokeColor,
 					points: []
 				};
 
@@ -360,13 +352,24 @@
 				helpers.each(dataset.data, function (dataPoint) {
 
 					//Add a new point for each piece of data, passing any required data to draw.
-					datasetObject.points.push(new this.FnPointClass({
+					datasetObject.points.push(new chartjs.Point({
+
+						ctx: this.chart.ctx,
+
 						arg: +dataPoint.x,
 						value: +dataPoint.y,
 						datasetLabel: dataset.label || null,
+
+						// point
+						display: this.options.pointDot,
+						radius: this.options.pointDotRadius,
+						hitDetectionRadius: this.options.pointHitDetectionRadius,
+						strokeWidth: this.options.pointDotStrokeWidth,
+
+						// colors
 						strokeColor: 'white',
-						fillColor: dataset.strokeColor,
-						highlightStroke: dataset.strokeColor,
+						highlightStroke: datasetObject.strokeColor,
+						fillColor: datasetObject.strokeColor,
 						highlightFill: 'white'
 					}));
 				}, this);
