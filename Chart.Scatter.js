@@ -8,12 +8,6 @@
 
 		// INHERIT
 		// showScale: true,						// Boolean - If we should show the scale at all
-		// scaleOverride: false,				// Boolean - If we want to override with a hard coded scale
-		// ** Required if scaleOverride is true **
-		// *** scaleSteps: null,				// Number - The number of steps in a hard coded scale
-		// *** scaleStepWidth: null,			// Number - The value jump in the hard coded scale
-		// *** scaleStartValue: null,			// Number - The scale starting value
-
 		// scaleLineColor: "rgba(0,0,0,.1)",		// String - Colour of the scale line
 		// scaleLineWidth: 1,						// Number - Pixel width of the scale line
 		// scaleShowLabels: true,					// Boolean - Whether to show labels on the scale
@@ -343,7 +337,7 @@
 	});
 
 	chartjs.Type.extend({
-		name: "FnLine",
+		name: "Scatter",
 		defaults: defaultConfig,
 
 		scaleClass: chartjs.FnScale,

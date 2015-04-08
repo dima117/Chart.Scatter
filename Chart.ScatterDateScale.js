@@ -7,6 +7,7 @@
 			timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,
 			timezoneClip = /[^-+\dA-Z]/g,
 			pad = function (val, len) {
+
 				val = String(val);
 				len = len || 2;
 				while (val.length < len) val = "0" + val;
@@ -165,7 +166,7 @@
 				{ u: 86400000, c: 5, t: 432000000, n: 'd' },
 				{ u: 604800000, c: 1, t: 604800000, n: 'w' }];
 
-			var maxSteps = drawingSize / (fontSize * 2);
+			var maxSteps = drawingSize / (fontSize * 3.3);
 
 			var valueRange = +valueMax - valueMin,
 				offset = 0,// new Date(+valueMin).getTimezoneOffset() * 60000,
@@ -211,7 +212,6 @@
 
 				var value = graphMin + stepValue * index;
 
-
 				labelsArray[index] = hlp.formatDateValue(value);
 			});
 
@@ -219,9 +219,9 @@
 		}
 	});
 
-	chartjs.types.FnLine.extend({
+	chartjs.types.Scatter.extend({
 
-		name: "DateFnLine",
+		name: "DateScatter",
 		defaults: {
 
 			scaleArgLabel: "mmm d, yyyy, hh:MM",
