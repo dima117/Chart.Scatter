@@ -4,8 +4,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5EC72027-6CC3-4338-A076-15833808929C}"
 	ProjectSection(SolutionItems) = preProject
 		Chart.js = Chart.js
-		Chart.ScatterDateScale.js = Chart.ScatterDateScale.js
 		Chart.Scatter.js = Chart.Scatter.js
+		Chart.Scatter.min.js = Chart.Scatter.min.js
 		docs.html = docs.html
 		index.html = index.html
 		README.md = README.md
