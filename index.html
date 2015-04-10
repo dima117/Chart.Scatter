@@ -1,17 +1,112 @@
 ﻿<!DOCTYPE html>
-
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
-	<meta charset="utf-8" />
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	<title>Scatter chart</title>
 
-	<title>title</title>
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css" />
+
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	<style>
+		body {
+			padding: 42px 0;
+		}
+
+		.jumbotron {
+			background-color: #4DB7EC;
+			color: white !important;
+		}
+
+			.jumbotron h1 {
+				margin-top: 0;
+			}
+
+		.btn-jumbotron {
+			background-color: transparent;
+			border-color: white;
+		}
+
+			.btn-jumbotron:hover {
+				border-color: transparent;
+				background-color: white;
+			}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="jumbotron">
+
+			<div class="row">
+				<div class="col-md-6">
+					<h1>
+						Scatter chart
+					</h1>
+					<p class="lead">
+						A graph in which the values of two variables are plotted along two axes. Chart.Scatter - is an addon for the
+						<a href="http://www.chartjs.org">Chart.js</a> library.
+					</p>
+					<div>
+						<a class="btn btn-lg btn-jumbotron" href="https://github.com/dima117/Chart.Scatter/archive/master.zip">Download</a>
+						<a class="btn btn-lg btn-jumbotron" href="https://github.com/dima117/Chart.Scatter">Source on GitHub</a>
+					</div>
+				</div>
+				<div class="col-md-6 hidden-sm hidden-xs">
+					<canvas id="header-canvas" width="420" height="180"></canvas>
+				</div>
+			</div>
+		</div>
+
+		<h2>Number scale</h2>
+		<canvas id="myChart" width="480" height="220" style="border: 1px dashed gray"></canvas>
+
+		<h2>Date scale</h2>
+		<canvas id="myChartWithDates" width="480" height="220"></canvas>
+	</div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
 	<script src="Chart.js"></script>
 	<script src="Chart.Scatter.js"></script>
 
-</head>
-<body>
-	<canvas id="myChartWithDates" width="480" height="220"></canvas>
-	<canvas id="myChart" width="480" height="220" style="border: 1px dashed gray"></canvas>
+	<script>
+
+		$(function () {
+
+			var data = [{ x: 0, y: 0 }];
+
+			for (var x = 1; x < 10; x++) {
+
+				var sq = Math.sqrt(x);
+				data.push({ x: x, y: sq });
+				data.unshift({ x: x, y: -sq });
+			}
+
+			var dataset = {
+				label: 'y = sqrt(x)',
+				strokeColor: 'white',
+				data: data
+			}
+
+			var ctx = document.getElementById("header-canvas").getContext("2d");
+			new Chart(ctx).Scatter([dataset], {
+				responsive: true,
+				scaleGridLineColor: "rgba(255,255,255,.3)",
+				scaleLineColor: "rgba(255,255,255,.8)"
+			});
+		});
+	</script>
+
+
+
 
 	<script>
 
