@@ -6,7 +6,7 @@
 
 	<title>title</title>
 	<script src="Chart.js"></script>
-	<script src="Chart.Scatter.min.js"></script>
+	<script src="Chart.Scatter.js"></script>
 
 </head>
 <body>
@@ -106,11 +106,12 @@
 			}];
 
 		var ctx2 = document.getElementById("myChartWithDates").getContext("2d");
-		var myDateLineChart = new Chart(ctx2).DateScatter(data2, {
+		var myDateLineChart = new Chart(ctx2).Scatter(data2, {
 			bezierCurve: true,
 			showTooltips: true,
 			scaleShowHorizontalLines: true,
 			scaleShowLabels: true,
+			scaleType: "date",
 			scaleLabel: "<%=value%>°C"
 		});
 

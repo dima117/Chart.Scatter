@@ -128,7 +128,7 @@
 	var defaultConfig = {
 
 		// INHERIT
-		// showScale: true,						// Boolean - If we should show the scale at all
+		// showScale: true,							// Boolean - If we should show the scale at all
 		// scaleLineColor: "rgba(0,0,0,.1)",		// String - Colour of the scale line
 		// scaleLineWidth: 1,						// Number - Pixel width of the scale line
 		// scaleShowLabels: true,					// Boolean - Whether to show labels on the scale
@@ -142,7 +142,12 @@
 		scaleShowHorizontalLines: true,			//Boolean - Whether to show horizontal lines (except X axis)
 		scaleShowVerticalLines: true,			//Boolean - Whether to show vertical lines (except Y axis)
 
-
+		// DATE SCALE
+		scaleType: "number",
+		useUtc: true,
+		scaleDateFormat: "mmm d",
+		scaleTimeFormat: "h:MM",
+		scaleDateTimeFormat: "mmm d, yyyy, hh:MM",
 
 		// LINES
 		datasetStroke: true,			// Boolean - Whether to show a stroke for datasets
@@ -176,6 +181,11 @@
 
 			this.font = helpers.fontString(this.fontSize, this.fontStyle, this.fontFamily);
 			this.padding = this.fontSize * 1.5;
+		},
+
+		setDataRange: function (dataRange) {
+
+			this.dataRange = dataRange;
 		},
 
 		api: {
@@ -280,6 +290,11 @@
 				this.xScaleRange.steps,
 				this.xScaleRange.min,
 				this.xScaleRange.stepValue);
+		},
+
+		argToString: function (arg) {
+
+			return +arg + "";
 		},
 
 		fit: function () {
@@ -534,6 +549,11 @@
 			);
 		},
 
+		argToString: function (arg) {
+
+			return dateFormat(+arg, this.dateTimeFormat, this.useUtc);
+		},
+
 		generateXLabels: function () {
 
 			var graphMin = this.xScaleRange.min,
@@ -557,11 +577,11 @@
 
 		defaults: defaultConfig,
 
-		scaleClass: chartjs.ScatterNumberScale,
-
 		initialize: function (datasets) {
 
 			this.datasets = [];
+			this.scale = this._initScale();
+
 
 			//Iterate through each of the datasets, and build this into a property of the chart
 			helpers.each(datasets, function (dataset) {
@@ -580,8 +600,9 @@
 					datasetObject.points.push(new chartjs.Point({
 
 						ctx: this.chart.ctx,
-						argLabel: this.formatLabelX(+dataPoint.x),
-						valueLabel: this.formatLabelY(+dataPoint.y),
+
+						argLabel: this.scale.argToString(+dataPoint.x),
+						valueLabel: +dataPoint.y + "",
 
 						arg: +dataPoint.x,
 						value: +dataPoint.y,
@@ -603,7 +624,8 @@
 
 			}, this);
 
-			this.buildScale();
+			var dataRange = this._calculateRange();
+			this.scale.setDataRange(dataRange);
 
 			//Set up tooltip events on the chart
 			if (this.options.showTooltips) {
@@ -630,22 +652,9 @@
 			this.render();
 		},
 
-		formatLabelX: function (arg) {
-
-			return helpers.template(this.options.scaleArgLabel, { value: arg });
-		},
-
-		formatLabelY: function (value) {
-
-			return helpers.template(this.options.scaleLabel, { value: value });
-		},
-
-		buildScale: function () {
-
-			var dataRange = this._calculateRange();
+		_initScale: function () {
 
 			var scaleOptions = {
-				dataRange: dataRange,
 				chart: this.chart,
 
 				textColor: this.options.scaleFontColor,
@@ -665,10 +674,18 @@
 				showVerticalLines: this.options.scaleShowVerticalLines,
 				lineWidth: this.options.scaleLineWidth,
 				lineColor: this.options.scaleLineColor,
-				display: this.options.showScale
+				display: this.options.showScale,
+
+				// dates
+				useUtc: this.options.useUtc,
+				dateFormat: this.options.scaleDateFormat,
+				timeFormat: this.options.scaleTimeFormat,
+				dateTimeFormat: this.options.scaleDateTimeFormat
 			};
 
-			this.scale = new this.scaleClass(scaleOptions);
+			return this.options.scaleType === "date"
+				? new chartjs.ScatterDateScale(scaleOptions)
+				: new chartjs.ScatterNumberScale(scaleOptions);
 		},
 
 		// helpers
@@ -893,20 +910,6 @@
 
 				this._forEachPoint(function (point) { point.draw(); });
 			}
-		}
-	});
-
-	chartjs.types.Scatter.extend({
-
-		name: "DateScatter",
-		defaults: {
-
-			scaleArgLabel: "mmm d, yyyy, hh:MM",
-		},
-		scaleClass: chartjs.ScatterDateScale,
-		formatLabelX: function (arg) {
-
-			return dateFormat(arg, this.options.scaleArgLabel, true);
 		}
 	});
 
