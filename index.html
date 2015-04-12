@@ -70,18 +70,50 @@
 			</div>
 		</div>
 
-		<h2>Introduction</h2>
-		<p>
-			
-		</p>
+
 		<div class="row">
+			<div class="col-md-6">
+				<h2>Introduction</h2>
+				<p>
+					First we need to include the Chart.js (or Chart.Core.js) and Chart.Scatter.js 
+					libraries on the page. 
+				</p>
+				<pre>
+&lt;script src="Chart.js">&lt;/script>
+&lt;script src="Chart.Scatter.js">&lt;/script>
+</pre>
+				<p>
+					To create a chart, we need to instantiate the Chart class. To do this, we
+					need to pass in the 2d context of where we want to draw the chart. Here's an 
+					example.
+				</p>
+				<pre>
+&lt;canvas id="myChart" width="400" height="400">&lt;/canvas>
+
+...
+
+// Get the context of the canvas element we want to select
+var ctx = document.getElementById("myChart").getContext("2d");
+</pre>
+				<p>
+					With the Chart class set up, we can go on to create Scatter chart.
+				</p>
+				<pre>
+new Chart(ctx).Scatter(data, options);
+</pre>
+				<p>
+					We call a method named Scatter. We pass in the data for that chart type, 
+					and the options for that chart as parameters. Chart.js will merge the 
+					global defaults with chart type specific defaults, then merge any options 
+					passed in as a second argument after data.
+				</p>
+			</div>
 			<div class="col-md-6">
 				<h3>Number scale</h3>
 				<canvas id="myChart" width="480" height="220"></canvas>
-			</div>
-			<div class="col-md-6">
 				<h3>Date scale</h3>
 				<canvas id="myChartWithDates" width="480" height="220"></canvas>
+
 			</div>
 		</div>
 		<h2>Example usage</h2>
