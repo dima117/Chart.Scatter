@@ -150,9 +150,10 @@
 		scaleDateTimeFormat: "mmm d, yyyy, hh:MM",
 
 		// LINES
-		datasetStroke: true,			// Boolean - Whether to show a stroke for datasets
-		datasetStrokeWidth: 2,			// Number - Pixel width of dataset stroke
-		datasetStrokeColor: '#007ACC',	// String - Color of dataset stroke
+		datasetStroke: true,				// Boolean - Whether to show a stroke for datasets
+		datasetStrokeWidth: 2,				// Number - Pixel width of dataset stroke
+		datasetStrokeColor: '#007ACC',		// String - Color of dataset stroke
+		datasetPointStrokeColor: 'white',	// String - Color of dataset stroke
 
 		bezierCurve: true,				// Boolean - Whether the line is curved between points
 		bezierCurveTension: 0.4,		// Number - Tension of the bezier curve between points
@@ -589,6 +590,9 @@
 				var datasetObject = {
 					label: dataset.label || null,
 					strokeColor: dataset.strokeColor || this.options.datasetStrokeColor,
+
+					pointColor: dataset.pointColor || dataset.strokeColor || this.options.datasetStrokeColor,
+					pointStrokeColor: dataset.pointStrokeColor || this.options.datasetPointStrokeColor,
 					points: []
 				};
 
@@ -615,10 +619,10 @@
 						strokeWidth: this.options.pointDotStrokeWidth,
 
 						// colors
-						strokeColor: 'white',
-						highlightStroke: datasetObject.strokeColor,
-						fillColor: datasetObject.strokeColor,
-						highlightFill: 'white'
+						strokeColor: datasetObject.pointStrokeColor,
+						highlightStroke: datasetObject.pointColor,
+						fillColor: datasetObject.pointColor,
+						highlightFill: datasetObject.pointStrokeColor
 					}));
 				}, this);
 

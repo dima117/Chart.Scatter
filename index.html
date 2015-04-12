@@ -30,14 +30,20 @@
 				margin-top: 0;
 			}
 
+			.jumbotron a {
+				color: #e6f5fc;
+			}
+
 		.btn-jumbotron {
 			background-color: transparent;
 			border-color: white;
+			color: white !important;
 		}
 
 			.btn-jumbotron:hover {
 				border-color: transparent;
 				background-color: white;
+				color: #4DB7EC !important;
 			}
 	</style>
 </head>
@@ -47,11 +53,10 @@
 
 			<div class="row">
 				<div class="col-md-6">
-					<h1>
-						Scatter chart
+					<h1>Chart.Scatter
 					</h1>
 					<p class="lead">
-						A graph in which the values of two variables are plotted along two axes. Chart.Scatter - is an addon for the
+						Scatter chart is a graph in which the values of two variables are plotted along two axes. Chart.Scatter - is an addon for the
 						<a href="http://www.chartjs.org">Chart.js</a> library.
 					</p>
 					<div>
@@ -65,11 +70,24 @@
 			</div>
 		</div>
 
-		<h2>Number scale</h2>
-		<canvas id="myChart" width="480" height="220" style="border: 1px dashed gray"></canvas>
+		<h2>Introduction</h2>
+		<p>
+			
+		</p>
+		<div class="row">
+			<div class="col-md-6">
+				<h3>Number scale</h3>
+				<canvas id="myChart" width="480" height="220"></canvas>
+			</div>
+			<div class="col-md-6">
+				<h3>Date scale</h3>
+				<canvas id="myChartWithDates" width="480" height="220"></canvas>
+			</div>
+		</div>
+		<h2>Example usage</h2>
+		<h2>Chart options</h2>
 
-		<h2>Date scale</h2>
-		<canvas id="myChartWithDates" width="480" height="220"></canvas>
+
 	</div>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
@@ -93,6 +111,7 @@
 			var dataset = {
 				label: 'y = sqrt(x)',
 				strokeColor: 'white',
+				pointStrokeColor: '#4db7ec',
 				data: data
 			}
 
@@ -104,9 +123,6 @@
 			});
 		});
 	</script>
-
-
-
 
 	<script>
 
@@ -152,7 +168,7 @@
 
 
 		Chart.defaults.global.responsive = true;
-		//Chart.defaults.global.animation = false;
+		Chart.defaults.global.animation = false;
 		var ctx = document.getElementById("myChart").getContext("2d");
 		var myLineChart = new Chart(ctx).Scatter(data, {
 			bezierCurve: true,
