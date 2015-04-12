@@ -1,12 +1,8 @@
 #Chart.Scatter
 
-*Alternative line chart plugin for Chart.js* [chartjs.org](http://www.chartjs.org)
+*Scatter chart plugin for Chart.js* [chartjs.org](http://www.chartjs.org)
 
-[Live demo](http://dima117.github.io/Chart.Scatter/)
-
-## Documentation
-
-You can find the documentation under `/docs`
+[Documentation & live demo](http://dima117.github.io/Chart.Scatter/)
 
 ## License
 

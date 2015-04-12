@@ -38,6 +38,7 @@
 			background-color: transparent;
 			border-color: white;
 			color: white !important;
+			margin-bottom: 4px;
 		}
 
 			.btn-jumbotron:hover {
@@ -73,7 +74,7 @@
 
 		<div class="row">
 			<div class="col-md-6">
-				<h2>Introduction</h2>
+				<h2>Creating a chart</h2>
 				<p>
 					First we need to include the Chart.js (or Chart.Core.js) and Chart.Scatter.js 
 					libraries on the page. 
@@ -110,26 +111,277 @@ new Chart(ctx).Scatter(data, options);
 			</div>
 			<div class="col-md-6">
 				<h3>Number scale</h3>
-				<canvas id="myChart" width="480" height="220"></canvas>
+				<div>
+					<canvas id="myChart" width="480" height="220"></canvas>
+					</div>
 				<h3>Date scale</h3>
+				<div>
 				<canvas id="myChartWithDates" width="480" height="220"></canvas>
-
+				</div>
 			</div>
 		</div>
-		<h2>Example usage</h2>
-		<h2>Chart options</h2>
+		<div class="row">
 
+			<div class="col-md-6">
+				<h2>Chart options</h2>
+				<p>
+					These are the customisation options specific to Scatter charts. 
+					These options are merged with the global chart configuration options, 
+					and form the options of the chart.
+				</p>
+				<pre>
+<strong>// SUPPORTED GLOBAL OPTIONS</strong>
 
+// Boolean - If we should show the scale at all
+showScale: <strong>true</strong>,
+
+// String - Colour of the scale line
+scaleLineColor: <strong>"rgba(0,0,0,.1)"</strong>,
+
+// Number - Pixel width of the scale line
+scaleLineWidth: <strong>1</strong>,
+
+// Boolean - Whether to show labels on the scale
+scaleShowLabels: <strong>true</strong>,
+
+// Interpolated JS string - can access value
+scaleLabel: <strong>"<%=value%>"</strong>,
+
+// Interpolated JS string - can access value
+scaleArgLabel: <strong>"<%=value%>"</strong>,
+
+<strong>// SCALE</strong>
+
+// Boolean - Whether grid lines are shown across the chart
+scaleShowGridLines: <strong>true</strong>,
+
+// Number - Width of the grid lines
+scaleGridLineWidth: <strong>1</strong>,
+
+// String - Colour of the grid lines
+scaleGridLineColor: <strong>"rgba(0,0,0,.05)"</strong>,
+
+// Boolean - Whether to show horizontal lines (except X axis)	
+scaleShowHorizontalLines: <strong>true</strong>,
+
+// Boolean - Whether to show vertical lines (except Y axis)
+scaleShowVerticalLines: <strong>true</strong>,
+
+<strong>// DATE SCALE</strong>
+
+// String - scale type: "number" or "date"
+scaleType: <strong>"number"</strong>,
+
+// Boolean - Whether to use UTC dates instead local
+useUtc: <strong>true</strong>,
+
+// String - short date format (used for scale labels)
+scaleDateFormat: <strong>"mmm d"</strong>,
+
+// String - short time format (used for scale labels)
+scaleTimeFormat: <strong>"h:MM"</strong>,
+
+// String - full date format (used for point labels)
+scaleDateTimeFormat: <strong>"mmm d, yyyy, hh:MM"</strong>,
+
+<strong>// LINES</strong>
+
+// Boolean - Whether to show a stroke for datasets
+datasetStroke: <strong>true</strong>,
+
+// Number - Pixel width of dataset stroke
+datasetStrokeWidth: <strong>2</strong>,
+
+// String - Color of dataset stroke
+datasetStrokeColor: <strong>'#007ACC'</strong>,
+
+// String - Color of dataset stroke
+datasetPointStrokeColor: <strong>'white'</strong>,
+
+// Boolean - Whether the line is curved between points
+bezierCurve: <strong>true</strong>,
+
+// Number - Tension of the bezier curve between points
+bezierCurveTension: <strong>0.4</strong>,
+
+<strong>// POINTS</strong>
+
+// Boolean - Whether to show a dot for each point
+pointDot: <strong>true</strong>,
+
+// Number - Pixel width of point dot stroke
+pointDotStrokeWidth: <strong>1</strong>,
+
+// Number - Radius of each point dot in pixels
+pointDotRadius: <strong>4</strong>,
+
+// Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+pointHitDetectionRadius: <strong>4</strong>,
+
+<strong>// TOOLTIPS</strong>
+
+// Interpolated JS string - can access point fields: 
+// argLabel, valueLabel, arg, value, datasetLabel
+tooltipTemplate: <strong>"<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%=argLabel%>; <%=valueLabel%>"</strong>
+
+// Interpolated JS string - can access point fields: 
+// argLabel, valueLabel, arg, value, datasetLabel
+multiTooltipTemplate: <strong>"<%=argLabel%>; <%=valueLabel%>",</strong>
+</pre>
+			</div>
+
+			<div class="col-md-6">
+				<h2>Data structure</h2>
+				<pre>
+var data = [
+    {
+      label: 'My First dataset',
+      strokeColor: '#F16220',
+      pointColor: '#F16220',
+      pointStrokeColor: '#fff',
+      data: [
+        { x: 19, y: 65 }, 
+        { x: 27, y: 59 }, 
+        { x: 28, y: 69 }, 
+        { x: 40, y: 81 },
+        { x: 48, y: 56 }
+      ]
+    },
+    {
+      label: 'My Second dataset',
+      strokeColor: '#007ACC',
+      pointColor: '#007ACC',
+      pointStrokeColor: '#fff',
+      data: [
+        { x: 19, y: 75 }, 
+        { x: 27, y: 69 }, 
+        { x: 28, y: 70 }, 
+        { x: 40, y: 31 },
+        { x: 48, y: 76 }, 
+        { x: 52, y: 23 }, 
+        { x: 24, y: 32 }
+      ]
+    }
+  ];
+</pre>
+				<h2>Date Format mask</h2>
+				<p>
+					Chart.Scatter uses the 
+					<a href="http://blog.stevenlevithan.com/archives/date-time-format" target="_blank">
+						date format library
+					</a> 
+					by Steven Levithan.
+				</p>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Mask</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>d</code></td>
+							<td>Day of the month as digits; no leading zero for single-digit days.</td>
+						</tr>
+						<tr>
+							<td><code>dd</code></td>
+							<td>Day of the month as digits; leading zero for single-digit days.</td>
+						</tr>
+						<tr>
+							<td><code>ddd</code></td>
+							<td>Day of the week as a three-letter abbreviation.</td>
+						</tr>
+						<tr>
+							<td><code>dddd</code></td>
+							<td>Day of the week as its full name.</td>
+						</tr>
+						<tr>
+							<td><code>m</code></td>
+							<td>Month as digits; no leading zero for single-digit months.</td>
+						</tr>
+						<tr>
+							<td><code>mm</code></td>
+							<td>Month as digits; leading zero for single-digit months.</td>
+						</tr>
+						<tr>
+							<td><code>mmm</code></td>
+							<td>Month as a three-letter abbreviation.</td>
+						</tr>
+						<tr>
+							<td><code>mmmm</code></td>
+							<td>Month as its full name.</td>
+						</tr>
+						<tr>
+							<td><code>yy</code></td>
+							<td>Year as last two digits; leading zero for years less than 10.</td>
+						</tr>
+						<tr>
+							<td><code>yyyy</code></td>
+							<td>Year represented by four digits.</td>
+						</tr>
+						<tr>
+							<td><code>h</code></td>
+							<td>Hours; no leading zero for single-digit hours (12-hour clock).</td>
+						</tr>
+						<tr>
+							<td><code>hh</code></td>
+							<td>Hours; leading zero for single-digit hours (12-hour clock).</td>
+						</tr>
+						<tr>
+							<td><code>H</code></td>
+							<td>Hours; no leading zero for single-digit hours (24-hour clock).</td>
+						</tr>
+						<tr>
+							<td><code>HH</code></td>
+							<td>Hours; leading zero for single-digit hours (24-hour clock).</td>
+						</tr>
+						<tr>
+							<td><code>M</code></td>
+							<td>Minutes; no leading zero for single-digit minutes.<br>
+								<span>Uppercase M unlike CF <code>timeFormat</code>'s m to avoid conflict with months.</span></td>
+						</tr>
+						<tr>
+							<td><code>MM</code></td>
+							<td>Minutes; leading zero for single-digit minutes.<br>
+								<span>Uppercase MM unlike CF <code>timeFormat</code>'s mm to avoid conflict with months.</span></td>
+						</tr>
+						<tr>
+							<td><code>s</code></td>
+							<td>Seconds; no leading zero for single-digit seconds.</td>
+						</tr>
+						<tr>
+							<td><code>ss</code></td>
+							<td>Seconds; leading zero for single-digit seconds.</td>
+						</tr>
+						<tr>
+							<td><code>l</code> <em>or</em> <code>L</code></td>
+							<td>Milliseconds. <code>l</code> gives 3 digits. <code>L</code> gives 2 digits.</td>
+						</tr>
+						<tr>
+							<td><code>'…'</code> <em>or</em> <code>"…"</code></td>
+							<td>Literal character sequence. Surrounding quotes are removed.<br>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
 	</div>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
-	<script src="Chart.js"></script>
-	<script src="Chart.Scatter.js"></script>
+	<script src="Chart.min.js"></script>
+	<script src="Chart.Scatter.min.js"></script>
 
 	<script>
 
+		Chart.defaults.global.responsive = true;
+		Chart.defaults.global.animation = false;
+
 		$(function () {
+
+			//#region header
 
 			var data = [{ x: 0, y: 0 }];
 
@@ -153,111 +405,86 @@ new Chart(ctx).Scatter(data, options);
 				scaleGridLineColor: "rgba(255,255,255,.3)",
 				scaleLineColor: "rgba(255,255,255,.8)"
 			});
+
+			//#endregion
+
+			var data2 = [
+				{
+					label: 'complex-1',
+					strokeColor: '#F16220',
+					data: [
+						{ x: 19, y: 65 }, { x: 27, y: 59 }, { x: 28, y: 69 }, { x: 40, y: 81 },
+						{ x: 48, y: 56 }, { x: 86, y: 55 }, { x: 90, y: 40 }, { x: 95, y: 60 }
+					]
+				},
+				{
+					label: 'complex-2',
+					strokeColor: '#007ACC',
+					data: [
+						{ x: 19, y: 75 }, { x: 27, y: 69 }, { x: 28, y: 70 }, { x: 40, y: 31 },
+						{ x: 48, y: 76 }, { x: 52, y: 23 }, { x: 24, y: 32 },
+						{ x: 86, y: 45 }, { x: 90, y: 50 }
+					]
+				}
+			];
+
+			var ctx = document.getElementById("myChart").getContext("2d");
+			var myLineChart = new Chart(ctx).Scatter(data2, {
+				bezierCurve: true,
+				showTooltips: true,
+				scaleShowHorizontalLines: true,
+				scaleShowLabels: true,
+				scaleLabel: "<%=value%>°C",
+				scaleArgLabel: "<%=value%>mmm",
+				scaleBeginAtZero: true
+			});
+
+			var data3 = [
+				{
+					label: 'temperature',
+					strokeColor: '#A31515',
+					data: [
+						{
+							x: new Date('2011-04-11T11:45:00'),
+							y: 25
+						},
+						{
+							x: new Date('2011-04-11T12:51:00'),
+							y: 28
+						},
+						{
+							x: new Date('2011-04-11T14:10:00'),
+							y: 22
+						},
+						{
+							x: new Date('2011-04-11T15:15:00'),
+							y: 18
+						},
+						{
+							x: new Date('2011-04-11T17:00:00'),
+							y: 25
+						},
+						{
+							x: new Date('2011-04-11T21:00:00'),
+							y: 24
+						},
+						{
+							x: new Date('2011-04-12T13:00:00'),
+							y: 24
+						}
+					]
+				}];
+
+			var ctx2 = document.getElementById("myChartWithDates").getContext("2d");
+			var myDateLineChart = new Chart(ctx2).Scatter(data3, {
+				bezierCurve: true,
+				showTooltips: true,
+				scaleShowHorizontalLines: true,
+				scaleShowLabels: true,
+				scaleType: "date",
+				scaleLabel: "<%=value%>°C"
+			});
 		});
-	</script>
-
-	<script>
-
-		var data = [
-			{
-				strokeColor: '#F16220',
-				data: [
-					{ x: 20, y: -50 }, { x: 50, y: 40 }, { x: 90, y: 5 }
-				]
-			},
-			{
-				label: 'simple-1',
-				data: [
-					{ x: 16, y: 15 }, { x: 110, y: 25 }
-				]
-			},
-			{
-				label: 'simple-2',
-				strokeColor: 'red',
-				data: [
-					{ x: 19, y: 160 }, { x: 112, y: 105 }
-				]
-			}
-			,
-			{
-				label: 'complex-1',
-				strokeColor: '#F16220',
-				data: [
-					{ x: 19, y: 65 }, { x: 27, y: 59 }, { x: 28, y: 69 }, { x: 40, y: 81 },
-					{ x: 48, y: 56 }, { x: 86, y: 55 }, { x: 90, y: 40 }, { x: 95, y: 60 }
-				]
-			},
-			{
-				label: 'complex-2',
-				strokeColor: '#007ACC',
-				data: [
-					{ x: 19, y: 75 }, { x: 27, y: 69 }, { x: 28, y: 70 }, { x: 40, y: 31 },
-					{ x: 48, y: 76 }, { x: 52, y: 23 }, { x: 24, y: 32 },
-					{ x: 86, y: 45 }, { x: 90, y: 50 }
-				]
-			}
-		];
-
-
-		Chart.defaults.global.responsive = true;
-		Chart.defaults.global.animation = false;
-		var ctx = document.getElementById("myChart").getContext("2d");
-		var myLineChart = new Chart(ctx).Scatter(data, {
-			bezierCurve: true,
-			showTooltips: true,
-			scaleShowHorizontalLines: true,
-			scaleShowLabels: true,
-			scaleLabel: "<%=value%>°C",
-			scaleArgLabel: "<%=value%>mmm",
-			scaleBeginAtZero: true
-		});
-
-		var data2 = [
-			{
-				label: 'temperature',
-				strokeColor: '#A31515',
-				data: [
-					{
-						x: new Date('2011-04-11T11:45:00'),
-						y: 25
-					},
-					{
-						x: new Date('2011-04-11T12:51:00'),
-						y: 28
-					},
-					{
-						x: new Date('2011-04-11T14:10:00'),
-						y: 22
-					},
-					{
-						x: new Date('2011-04-11T15:15:00'),
-						y: 18
-					},
-					{
-						x: new Date('2011-04-11T17:00:00'),
-						y: 25
-					},
-					{
-						x: new Date('2011-04-11T21:00:00'),
-						y: 24
-					},
-					{
-						x: new Date('2011-04-12T13:00:00'),
-						y: 24
-					}
-				]
-			}];
-
-		var ctx2 = document.getElementById("myChartWithDates").getContext("2d");
-		var myDateLineChart = new Chart(ctx2).Scatter(data2, {
-			bezierCurve: true,
-			showTooltips: true,
-			scaleShowHorizontalLines: true,
-			scaleShowLabels: true,
-			scaleType: "date",
-			scaleLabel: "<%=value%>°C"
-		});
-
 	</script>
 </body>
 </html>
