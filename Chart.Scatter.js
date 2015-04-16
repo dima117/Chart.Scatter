@@ -181,7 +181,8 @@
 			// рассчитываем вспомогательные параметры
 
 			this.font = helpers.fontString(this.fontSize, this.fontStyle, this.fontFamily);
-			this.padding = this.fontSize * 1.5;
+			this.padding = this.fontSize / 2;
+			this.padding2 = this.fontSize * 1.5;
 		},
 
 		setDataRange: function (dataRange) {
@@ -305,7 +306,7 @@
 			this.generateYLabels();
 
 			this.xPadding = this.showLabels
-				? helpers.longestText(this.chart.ctx, this.font, this.yLabels) + this.padding : 0;
+				? helpers.longestText(this.chart.ctx, this.font, this.yLabels) + this.padding2 : 0;
 
 			// horisontal labels & padding
 			this.calculateXscaleRange();
@@ -318,7 +319,7 @@
 			this.xLabelRotation = xLabelMaxWidth > xStepWidth;
 
 			this.yPadding = this.showLabels
-				? (this.xLabelRotation ? xLabelMaxWidth : xLabelHeight) + this.padding
+				? (this.xLabelRotation ? xLabelMaxWidth : xLabelHeight) + this.padding2
 				: 0;
 		},
 
@@ -356,11 +357,11 @@
 
 		calculateX: function (x) {
 
-			return this.xPadding + ((x - this.xScaleRange.min) * (this.chart.width - this.xPadding) / (this.xScaleRange.max - this.xScaleRange.min));
+			return this.xPadding + ((x - this.xScaleRange.min) * (this.chart.width - this.xPadding - this.padding) / (this.xScaleRange.max - this.xScaleRange.min));
 		},
 		calculateY: function (y, ease) {
 
-			return this.chart.height - this.yPadding - ((y - this.yScaleRange.min) * (this.chart.height - this.yPadding) / (this.yScaleRange.max - this.yScaleRange.min)) * (ease || 1);
+			return this.chart.height - this.yPadding - ((y - this.yScaleRange.min) * (this.chart.height - this.yPadding - this.padding) / (this.yScaleRange.max - this.yScaleRange.min)) * (ease || 1);
 		},
 
 		draw: function () {
@@ -370,13 +371,13 @@
 			if (this.display) {
 
 				var xpos1 = this.calculateX(this.xScaleRange.min);
-				var xpos2 = this.calculateX(this.xScaleRange.max);
+				var xpos2 = this.chart.width;
 				var ypos1 = this.calculateY(this.yScaleRange.min);
-				var ypos2 = this.calculateY(this.yScaleRange.max);
+				var ypos2 = 0;
 
 				// y axis
 				for (index = 0, value = this.yScaleRange.min;
-					 index < this.yScaleRange.steps;
+					 index <= this.yScaleRange.steps;
 					 index++, value += this.yScaleRange.stepValue) {
 
 					var ypos = this.calculateY(value);
@@ -401,7 +402,7 @@
 						// черточки
 						ctx.beginPath();
 						ctx.moveTo(xpos1, ypos);
-						ctx.lineTo(xpos1 - (this.padding / 3), ypos);
+						ctx.lineTo(xpos1 - (this.padding2 / 3), ypos);
 						ctx.stroke();
 
 						// text
@@ -409,13 +410,13 @@
 						ctx.textBaseline = "middle";
 						ctx.font = this.font;
 						ctx.fillStyle = this.textColor;
-						ctx.fillText(this.yLabels[index], xpos1 - (this.padding / 2), ypos);
+						ctx.fillText(this.yLabels[index], xpos1 - (this.padding2 / 2), ypos);
 					}
 				}
 
 				// x axis
 				for (index = 0, value = this.xScaleRange.min;
-					 index < this.xScaleRange.steps;
+					 index <= this.xScaleRange.steps;
 					 index++, value += this.xScaleRange.stepValue) {
 
 					var xpos = this.calculateX(value);
@@ -440,12 +441,12 @@
 						// черточки
 						ctx.beginPath();
 						ctx.moveTo(xpos, ypos1);
-						ctx.lineTo(xpos, ypos1 + (this.padding / 3));
+						ctx.lineTo(xpos, ypos1 + (this.padding2 / 3));
 						ctx.stroke();
 
 						// text
 						ctx.save();
-						ctx.translate(xpos, ypos1 + (this.padding / 2));
+						ctx.translate(xpos, ypos1 + (this.padding2 / 2));
 						ctx.rotate(this.xLabelRotation ? -Math.PI / 2 : 0);
 						ctx.textAlign = (this.xLabelRotation) ? "right" : "center";
 						ctx.textBaseline = (this.xLabelRotation) ? "middle" : "top";

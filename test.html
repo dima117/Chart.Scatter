@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<title></title>
+	<script src="Chart.Core.js"></script>
+	<script src="Chart.Scatter.js"></script>
+</head>
+<body>
+	<canvas id="header-canvas" width="640" height="480"></canvas>
+
+	<script>
+		var ctx = document.getElementById("header-canvas").getContext("2d");
+		new Chart(ctx).Scatter([{
+			data: [
+				{ x: 10, y: 22 },
+				{ x: 20, y: 25 },
+				{ x: 30, y: 21 },
+				{ x: 40, y: 23 },
+			]
+		}]);
+	</script>
+</body>
+</html>
