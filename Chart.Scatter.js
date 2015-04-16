@@ -243,7 +243,7 @@
 
 			generateLabels: function (templateString, numberOfSteps, graphMin, stepValue) {
 
-				var labelsArray = new Array(numberOfSteps);
+				var labelsArray = new Array(numberOfSteps + 1);
 				if (templateString) {
 
 					helpers.each(labelsArray, function (val, index) {
