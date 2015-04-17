@@ -182,7 +182,6 @@
 
 			this.font = helpers.fontString(this.fontSize, this.fontStyle, this.fontFamily);
 			this.padding = this.fontSize / 2;
-			this.padding2 = this.fontSize * 1.5;
 		},
 
 		setDataRange: function (dataRange) {
@@ -305,8 +304,8 @@
 			this.calculateYscaleRange();
 			this.generateYLabels();
 
-			this.xPadding = this.showLabels
-				? helpers.longestText(this.chart.ctx, this.font, this.yLabels) + this.padding2 : 0;
+			this.xPadding = this.display && this.showLabels
+				? helpers.longestText(this.chart.ctx, this.font, this.yLabels) + this.padding * 2 : this.padding;
 
 			// horisontal labels & padding
 			this.calculateXscaleRange();
@@ -318,9 +317,9 @@
 
 			this.xLabelRotation = xLabelMaxWidth > xStepWidth;
 
-			this.yPadding = this.showLabels
-				? (this.xLabelRotation ? xLabelMaxWidth : xLabelHeight) + this.padding2
-				: 0;
+			this.yPadding = this.display && this.showLabels
+				? (this.xLabelRotation ? xLabelMaxWidth : xLabelHeight) + this.padding * 2
+				: this.padding;
 		},
 
 		updateBezierControlPoints: function (dataSetPoints, ease, tension) {
@@ -382,14 +381,15 @@
 
 					var ypos = this.calculateY(value);
 
-					if (this.showHorizontalLines) {
+					if (this.showLabels || this.showHorizontalLines) {
 
-						ctx.lineWidth = this.gridLineWidth;
-						ctx.strokeStyle = this.gridLineColor;
+						// line color
+						ctx.lineWidth = index == 0 ? this.lineWidth : this.gridLineWidth;
+						ctx.strokeStyle = index == 0 ? this.lineColor : this.gridLineColor;
 
 						ctx.beginPath();
-						ctx.moveTo(xpos1, ypos);
-						ctx.lineTo(xpos2, ypos);
+						ctx.moveTo(xpos1 - this.padding, ypos);
+						ctx.lineTo(this.showHorizontalLines || index == 0 ? xpos2 : xpos1, ypos);
 						ctx.stroke();
 					}
 
@@ -399,18 +399,12 @@
 						ctx.lineWidth = this.lineWidth;
 						ctx.strokeStyle = this.lineColor;
 
-						// черточки
-						ctx.beginPath();
-						ctx.moveTo(xpos1, ypos);
-						ctx.lineTo(xpos1 - (this.padding2 / 3), ypos);
-						ctx.stroke();
-
 						// text
 						ctx.textAlign = "right";
 						ctx.textBaseline = "middle";
 						ctx.font = this.font;
 						ctx.fillStyle = this.textColor;
-						ctx.fillText(this.yLabels[index], xpos1 - (this.padding2 / 2), ypos);
+						ctx.fillText(this.yLabels[index], xpos1 - this.padding * 1.4, ypos);
 					}
 				}
 
@@ -421,14 +415,15 @@
 
 					var xpos = this.calculateX(value);
 
-					if (this.showVerticalLines) {
+					if (this.showLabels || this.showVerticalLines) {
 
-						ctx.lineWidth = this.gridLineWidth;
-						ctx.strokeStyle = this.gridLineColor;
+						// line color
+						ctx.lineWidth = index == 0 ? this.lineWidth : this.gridLineWidth;
+						ctx.strokeStyle = index == 0 ? this.lineColor : this.gridLineColor;
 
 						ctx.beginPath();
-						ctx.moveTo(xpos, ypos1);
-						ctx.lineTo(xpos, ypos2);
+						ctx.moveTo(xpos, ypos1 + this.padding);
+						ctx.lineTo(xpos, this.showVerticalLines || index == 0 ? ypos2 : ypos1);
 						ctx.stroke();
 					}
 
@@ -438,15 +433,9 @@
 						ctx.lineWidth = this.lineWidth;
 						ctx.strokeStyle = this.lineColor;
 
-						// черточки
-						ctx.beginPath();
-						ctx.moveTo(xpos, ypos1);
-						ctx.lineTo(xpos, ypos1 + (this.padding2 / 3));
-						ctx.stroke();
-
 						// text
 						ctx.save();
-						ctx.translate(xpos, ypos1 + (this.padding2 / 2));
+						ctx.translate(xpos, ypos1 + (this.padding * 1.4));
 						ctx.rotate(this.xLabelRotation ? -Math.PI / 2 : 0);
 						ctx.textAlign = (this.xLabelRotation) ? "right" : "center";
 						ctx.textBaseline = (this.xLabelRotation) ? "middle" : "top";
@@ -456,20 +445,6 @@
 						ctx.restore();
 					}
 				}
-
-				// axis
-				ctx.lineWidth = this.lineWidth;
-				ctx.strokeStyle = this.lineColor;
-
-				ctx.beginPath();
-				ctx.moveTo(xpos1, 0);
-				ctx.lineTo(xpos1, ypos1);
-				ctx.stroke();
-
-				ctx.beginPath();
-				ctx.moveTo(xpos1, ypos1);
-				ctx.lineTo(xpos2, ypos1);
-				ctx.stroke();
 			}
 		}
 	});

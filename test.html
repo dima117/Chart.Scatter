@@ -12,14 +12,25 @@
 
 	<script>
 		var ctx = document.getElementById("header-canvas").getContext("2d");
-		new Chart(ctx).Scatter([{
-			data: [
-				{ x: 10, y: 22 },
-				{ x: 20, y: 25 },
-				{ x: 30, y: 21 },
-				{ x: 40, y: 23 },
-			]
-		}]);
+		new Chart(ctx).Scatter([
+			{
+				data: [
+					{ x: 10, y: 22000 },
+					{ x: 20, y: 25000 },
+					{ x: 30, y: 21000 },
+					{ x: 40, y: 23000 }
+				]
+			}
+		], {
+			showScale: true,
+			scaleShowLabels: true,
+			scaleShowHorizontalLines: true,
+			scaleShowVerticalLines: true,
+			scaleLineWidth: 1,
+			scaleLineColor: "red",
+			scaleGridLineColor: "#999",
+			scaleGridLineWidth: 1
+		});
 	</script>
 </body>
 </html>
