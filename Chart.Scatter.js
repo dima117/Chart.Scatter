@@ -309,14 +309,13 @@
 			var xLabelMaxWidth = helpers.longestText(this.chart.ctx, this.font, this.xLabels);
 			var yLabelMaxWidth = helpers.longestText(this.chart.ctx, this.font, this.yLabels);
 
-			var xStepWidth = Math.floor((this.chart.width - this.xPadding) / this.xScaleRange.steps);
-			var xLabelHeight = this.fontSize * 1.5;
-
-			this.xLabelRotation = xLabelMaxWidth > xStepWidth;
-
 			this.xPadding = this.display && this.showLabels
 				? yLabelMaxWidth + this.padding * 2
 				: this.padding;
+
+			var xStepWidth = Math.floor((this.chart.width - this.xPadding) / this.xScaleRange.steps);
+			var xLabelHeight = this.fontSize * 1.5;
+			this.xLabelRotation = xLabelMaxWidth > xStepWidth;
 
 			this.xPaddingRight = this.display && this.showLabels && !this.xLabelRotation
 				? xLabelMaxWidth / 2
