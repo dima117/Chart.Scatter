@@ -300,22 +300,27 @@
 
 		fit: function () {
 
-			// vertical labels & padding
+			// labels & padding
 			this.calculateYscaleRange();
-			this.generateYLabels();
-
-			this.xPadding = this.display && this.showLabels
-				? helpers.longestText(this.chart.ctx, this.font, this.yLabels) + this.padding * 2 : this.padding;
-
-			// horisontal labels & padding
 			this.calculateXscaleRange();
+			this.generateYLabels();
 			this.generateXLabels();
 
-			var xStepWidth = Math.floor((this.chart.width - this.xPadding) / this.xScaleRange.steps);
 			var xLabelMaxWidth = helpers.longestText(this.chart.ctx, this.font, this.xLabels);
+			var yLabelMaxWidth = helpers.longestText(this.chart.ctx, this.font, this.yLabels);
+
+			var xStepWidth = Math.floor((this.chart.width - this.xPadding) / this.xScaleRange.steps);
 			var xLabelHeight = this.fontSize * 1.5;
 
 			this.xLabelRotation = xLabelMaxWidth > xStepWidth;
+
+			this.xPadding = this.display && this.showLabels
+				? yLabelMaxWidth + this.padding * 2
+				: this.padding;
+
+			this.xPaddingRight = this.display && this.showLabels && !this.xLabelRotation
+				? xLabelMaxWidth / 2
+				: this.padding;
 
 			this.yPadding = this.display && this.showLabels
 				? (this.xLabelRotation ? xLabelMaxWidth : xLabelHeight) + this.padding * 2
@@ -356,7 +361,7 @@
 
 		calculateX: function (x) {
 
-			return this.xPadding + ((x - this.xScaleRange.min) * (this.chart.width - this.xPadding - this.padding) / (this.xScaleRange.max - this.xScaleRange.min));
+			return this.xPadding + ((x - this.xScaleRange.min) * (this.chart.width - this.xPadding - this.xPaddingRight) / (this.xScaleRange.max - this.xScaleRange.min));
 		},
 		calculateY: function (y, ease) {
 
@@ -493,7 +498,7 @@
 			var maxSteps = drawingSize / (fontSize * 3.3);
 
 			var valueRange = +valueMax - valueMin,
-				offset = 0,// new Date(+valueMin).getTimezoneOffset() * 60000,
+				offset = 0,
 				min = +valueMin + offset,
 				max = +valueMax + offset;
 
@@ -535,7 +540,7 @@
 
 			var graphMin = this.xScaleRange.min,
 				stepValue = this.xScaleRange.stepValue,
-				labelsArray = new Array(this.xScaleRange.steps);
+				labelsArray = new Array(this.xScaleRange.steps + 1);
 
 			helpers.each(labelsArray, function (val, index) {
 
@@ -547,7 +552,6 @@
 			this.xLabels = labelsArray;
 		}
 	});
-
 
 	chartjs.Type.extend({
 		name: "Scatter",
