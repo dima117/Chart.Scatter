@@ -593,13 +593,19 @@
 
 				helpers.each(dataset.data, function (dataPoint) {
 
+					var formattedArg = this.scale.argToString(+dataPoint.x),
+						formattedValue = +dataPoint.y + "";
+
+					var argLabel = helpers.template(this.options.scaleArgLabel, { value: formattedArg }),
+						valueLabel = helpers.template(this.options.scaleLabel, { value: formattedValue });
+
 					//Add a new point for each piece of data, passing any required data to draw.
 					datasetObject.points.push(new chartjs.Point({
 
 						ctx: this.chart.ctx,
 
-						argLabel: this.scale.argToString(+dataPoint.x),
-						valueLabel: +dataPoint.y + "",
+						argLabel: argLabel,
+						valueLabel: valueLabel,
 
 						arg: +dataPoint.x,
 						value: +dataPoint.y,
