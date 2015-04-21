@@ -457,6 +457,7 @@
 
 		_calculateDateScaleRange: function (valueMin, valueMax, drawingSize, fontSize) {
 
+			// todo: move to global object
 			var units = [
 				{ u: 1, c: 1, t: 1, n: 'ms' },
 				{ u: 1, c: 2, t: 2, n: 'ms' },
@@ -501,10 +502,23 @@
 				min = +valueMin + offset,
 				max = +valueMax + offset;
 
-			var xp = 0;
+			var xp = 0, f = [2, 3, 5, 7, 10];
 
-			while (xp < units.length && (valueRange / units[xp].t > maxSteps)) {
+			while (valueRange / units[xp].t > maxSteps) {
 				xp++;
+
+				if (xp == units.length) {
+
+					var last = units[units.length - 1];
+					for (var fp = 0; fp < f.length; fp++) {
+						units.push({
+							u: last.u,
+							c: last.c * f[fp],
+							t: last.c * f[fp] * last.u,
+							n: last.n
+						});
+					}
+				}
 			}
 
 			var stepValue = units[xp].t,

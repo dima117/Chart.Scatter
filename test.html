@@ -11,15 +11,24 @@
 	<canvas id="header-canvas" width="640" height="480"></canvas>
 
 	<script>
+		function getRandomInt(min, max) {
+			return Math.floor(Math.random() * (max - min + 1)) + min;
+		}
+
+		var data = [];
+
+		for (var ii = 0; ii < 400; ii++) {
+
+			data.push({
+				x: new Date(2015, 1, ii),
+				y: getRandomInt(0, 100)
+			});
+		}
+
 		var ctx = document.getElementById("header-canvas").getContext("2d");
 		new Chart(ctx).Scatter([
 			{
-				data: [
-					{ x: 10, y: 22000 },
-					{ x: 20, y: 25000 },
-					{ x: 30, y: 21000 },
-					{ x: 50, y: 23000 }
-				]
+				data: data
 			}
 		], {
 			showScale: true,
@@ -31,7 +40,9 @@
 			scaleGridLineColor: "#999",
 			scaleLabel: "<%=value%>°C",
 			scaleArgLabel: "<%=value%>mmm",
-			scaleGridLineWidth: 1
+			scaleGridLineWidth: 1,
+			pointDot: false,
+			scaleType: 'date'
 		});
 	</script>
 </body>
