@@ -5,7 +5,7 @@
 		helpers = chartjs.helpers,
 		hlp = {
 
-			formatDateValue: function (date) {
+			formatDateValue: function (date, tFormat, dFormat) {
 
 				date = new Date(+date);
 
@@ -22,10 +22,10 @@
 
 				if (hasTime) {
 
-					return dateFormat(date, "h:MM", true);
+					return dateFormat(date, tFormat || "h:MM", true);
 				} else {
 
-					return dateFormat(date, "mmm d", true);
+					return dateFormat(date, dFormat || "mmm d", true);
 				}
 			}
 		};
@@ -559,8 +559,8 @@
 
 				var value = graphMin + stepValue * index;
 
-				labelsArray[index] = hlp.formatDateValue(value);
-			});
+				labelsArray[index] = hlp.formatDateValue(value, this.timeFormat, this.dateFormat);
+			}, this);
 
 			this.xLabels = labelsArray;
 		}
