@@ -135,6 +135,8 @@
 		// scaleLabel: "<%=value%>",				// Interpolated JS string - can access value
 		scaleArgLabel: "<%=value%>",				// Interpolated JS string - can access value
 
+		emptyDataMessage: "chart has no data",
+
 		// SCALE
 		scaleShowGridLines: true,				//Boolean - Whether grid lines are shown across the chart
 		scaleGridLineWidth: 1,					//Number - Width of the grid lines
@@ -573,6 +575,7 @@
 
 		initialize: function (datasets) {
 
+			this.hasData = false;
 			this.datasets = [];
 			this.scale = this._initScale();
 
@@ -592,6 +595,8 @@
 				this.datasets.push(datasetObject);
 
 				helpers.each(dataset.data, function (dataPoint) {
+
+					this.hasData = true;
 
 					var formattedArg = this.scale.argToString(+dataPoint.x),
 						formattedValue = +dataPoint.y + "";
@@ -827,6 +832,28 @@
 			}
 		},
 
+		_drawMessage: function(message) {
+
+			var ctx = this.chart.ctx,
+				width = this.chart.width,
+				height = this.chart.height,
+
+				fontSize = this.options.scaleFontSize,
+				fontStyle = this.options.scaleFontStyle,
+				fontFamily = this.options.scaleFontFamily,
+				font = helpers.fontString(fontSize, fontStyle, fontFamily);
+
+			// text
+			ctx.save();
+			ctx.translate(width / 2, height / 2);
+			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
+			ctx.font = font;
+			ctx.fillStyle = this.options.scaleFontColor;
+			ctx.fillText(message, 0, 0);
+			ctx.restore();
+		},
+
 		_drawLine: function (dataset) {
 
 			var ctx = this.chart.ctx,
@@ -885,33 +912,40 @@
 
 		draw: function (ease) {
 
-			// update view params
-			this.scale.fit();
+			if (this.hasData) {
 
-			this._forEachDataset(function (dataset) {
+				// update view params
+				this.scale.fit();
 
-				this.scale.updatePoints(dataset.points, ease);
+				this._forEachDataset(function(dataset) {
 
-				if (this.options.bezierCurve) {
+					this.scale.updatePoints(dataset.points, ease);
 
-					this.scale.updateBezierControlPoints(dataset.points, ease, this.options.bezierCurveTension);
+					if (this.options.bezierCurve) {
+
+						this.scale.updateBezierControlPoints(dataset.points, ease, this.options.bezierCurveTension);
+					}
+				});
+
+				// draw
+				this.clear();
+				this.scale.draw();
+
+				// draw lines
+				if (this.options.datasetStroke) {
+
+					helpers.each(this.datasets, this._drawLine, this);
 				}
-			});
 
-			// draw
-			this.clear();
-			this.scale.draw();
+				// draw points
+				if (this.options.pointDot) {
 
-			// draw lines
-			if (this.options.datasetStroke) {
+					this._forEachPoint(function(point) { point.draw(); });
+				}
+			} else {
 
-				helpers.each(this.datasets, this._drawLine, this);
-			}
-
-			// draw points
-			if (this.options.pointDot) {
-
-				this._forEachPoint(function (point) { point.draw(); });
+				this.clear();
+				this._drawMessage(this.options.emptyDataMessage);
 			}
 		}
 	});
