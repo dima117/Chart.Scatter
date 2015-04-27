@@ -500,7 +500,7 @@
 			var maxSteps = drawingSize / (fontSize * 3.3);
 
 			var valueRange = +valueMax - valueMin,
-				offset = 0,
+				offset = this.useUtc ? 0 : new Date().getTimezoneOffset() * 60000,
 				min = +valueMin + offset,
 				max = +valueMax + offset;
 

@@ -17,10 +17,10 @@
 
 		var data = [];
 
-		for (var ii = 0; ii < 25; ii++) {
+		for (var ii = 0; ii < 5; ii++) {
 
 			data.push({
-				x: Date.parse("2015-04-27 18:00:00 +0300") + ii * 3600000,
+				x: Date.parse("2015-04-27 04:00:00 +0300") + ii * 24 * 3600000,
 				y: getRandomInt(0, 100)
 			});
 		}
@@ -43,7 +43,7 @@
 			scaleTimeFormat: "HH:MM",
 			scaleDateTimeFormat: "HH:MM",
 			scaleGridLineWidth: 1,
-			useUtc: false,
+			useUtc: true,
 			pointDot: true,
 			scaleType: 'date'
 		});
