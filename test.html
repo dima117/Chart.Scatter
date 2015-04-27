@@ -17,10 +17,10 @@
 
 		var data = [];
 
-		for (var ii = 0; ii < 50; ii++) {
+		for (var ii = 0; ii < 25; ii++) {
 
 			data.push({
-				x: new Date(2015, 1, ii),
+				x: Date.parse("2015-04-27 18:00:00 +0300") + ii * 3600000,
 				y: getRandomInt(0, 100)
 			});
 		}
@@ -39,10 +39,12 @@
 			scaleLineColor: "red",
 			scaleGridLineColor: "#999",
 			scaleLabel: "<%=value%>°C",
-			scaleArgLabel: "<%=value%>mmm",
 			scaleDateFormat: "mm/yyyy",
+			scaleTimeFormat: "HH:MM",
+			scaleDateTimeFormat: "HH:MM",
 			scaleGridLineWidth: 1,
-			pointDot: false,
+			useUtc: false,
+			pointDot: true,
 			scaleType: 'date'
 		});
 	</script>

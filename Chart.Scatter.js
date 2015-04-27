@@ -5,27 +5,27 @@
 		helpers = chartjs.helpers,
 		hlp = {
 
-			formatDateValue: function (date, tFormat, dFormat) {
+			formatDateValue: function (date, tFormat, dFormat, useUtc) {
 
 				date = new Date(+date);
 
-				var ms = date.getUTCMilliseconds();
+				var ms = useUtc ? date.getUTCMilliseconds() : date.getMilliseconds();
 
 				if (ms) {
 
 					return ('000' + ms).slice(-3);
 				}
 
-				var hasTime = date.getUTCHours() +
-					date.getUTCMinutes() +
-					date.getUTCSeconds();
+				var hasTime = useUtc
+					? date.getUTCHours() + date.getUTCMinutes() + date.getUTCSeconds()
+					: date.getHours() + date.getMinutes() + date.getSeconds();
 
 				if (hasTime) {
 
-					return dateFormat(date, tFormat || "h:MM", true);
+					return dateFormat(date, tFormat || "h:MM", useUtc);
 				} else {
 
-					return dateFormat(date, dFormat || "mmm d", true);
+					return dateFormat(date, dFormat || "mmm d", useUtc);
 				}
 			}
 		};
@@ -561,7 +561,7 @@
 
 				var value = graphMin + stepValue * index;
 
-				labelsArray[index] = hlp.formatDateValue(value, this.timeFormat, this.dateFormat);
+				labelsArray[index] = hlp.formatDateValue(value, this.timeFormat, this.dateFormat, this.useUtc);
 			}, this);
 
 			this.xLabels = labelsArray;
