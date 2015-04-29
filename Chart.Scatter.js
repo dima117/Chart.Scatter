@@ -501,8 +501,8 @@
 
 			var valueRange = +valueMax - valueMin,
 				offset = this.useUtc ? 0 : new Date().getTimezoneOffset() * 60000,
-				min = +valueMin + offset,
-				max = +valueMax + offset;
+				min = +valueMin - offset,
+				max = +valueMax - offset;
 
 			var xp = 0, f = [2, 3, 5, 7, 10];
 
@@ -529,8 +529,8 @@
 				end = start + stepValue * stepCount;
 
 			return {
-				min: start - offset,
-				max: end - offset,
+				min: start + offset,
+				max: end + offset,
 				steps: stepCount,
 				stepValue: stepValue
 			};
