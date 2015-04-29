@@ -9,13 +9,14 @@
 </head>
 <body>
 	<canvas id="header-canvas" width="640" height="480"></canvas>
+	<div id="legend"></div>
 
 	<script>
 		function getRandomInt(min, max) {
 			return Math.floor(Math.random() * (max - min + 1)) + min;
 		}
 
-		var data = [];
+		var data = [], data2 = [];
 
 		for (var ii = 0; ii < 5; ii++) {
 
@@ -23,14 +24,15 @@
 				x: Date.parse("2015-04-27 04:00:00 +0300") + ii * 24 * 3600000,
 				y: getRandomInt(0, 100)
 			});
+
+			data2.push({
+				x: Date.parse("2015-04-27 04:00:00 +0300") + ii * 24 * 3600000,
+				y: getRandomInt(0, 100)
+			});
 		}
 
 		var ctx = document.getElementById("header-canvas").getContext("2d");
-		new Chart(ctx).Scatter([
-			{
-				data: data
-			}
-		], {
+		var chart = new Chart(ctx).Scatter([{ label: "dataset 1", data: data }, { label: "dataset 2", data: data2 }], {
 			showScale: true,
 			scaleShowLabels: true,
 			scaleShowHorizontalLines: true,
@@ -47,6 +49,8 @@
 			pointDot: true,
 			scaleType: 'date'
 		});
+
+		document.getElementById("legend").innerHTML = chart.generateLegend();
 	</script>
 </body>
 </html>

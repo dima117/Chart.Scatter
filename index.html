@@ -221,7 +221,7 @@ pointDotRadius: <strong>4</strong>,
 // Number - amount extra to add to the radius to cater for hit detection outside the drawn point
 pointHitDetectionRadius: <strong>4</strong>,
 
-<strong>// TOOLTIPS</strong>
+<strong>// TEMPLATES</strong>
 
 // Interpolated JS string - can access point fields: 
 // argLabel, valueLabel, arg, value, datasetLabel
@@ -230,6 +230,9 @@ tooltipTemplate: <strong>"<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%=argLa
 // Interpolated JS string - can access point fields: 
 // argLabel, valueLabel, arg, value, datasetLabel
 multiTooltipTemplate: <strong>"<%=argLabel%>; <%=valueLabel%>",</strong>
+
+// Interpolated JS string - can access all chart fields
+legendTemplate: <strong>"&lt;ul class=\"&lt;%=name.toLowerCase()%>-legend\">&lt;%for(var i=0;i&lt;datasets.length;i++){%>&lt;li>&lt;span class=\"&lt;%=name.toLowerCase()%>-legend-marker\" style=\"background-color:&lt;%=datasets[i].strokeColor%>\">&lt;/span>&lt;%=datasets[i].label%>&lt;/li>&lt;%}%>&lt;/ul>"</strong>
 </pre>
 			</div>
 
