@@ -135,7 +135,7 @@
 		// scaleLabel: "<%=value%>",				// Interpolated JS string - can access value
 		scaleArgLabel: "<%=value%>",				// Interpolated JS string - can access value
 
-		emptyDataMessage: "chart has no data",
+		emptyDataMessage: "chart has no data",		// String - Message for empty data
 
 		// SCALE
 		scaleShowGridLines: true,				//Boolean - Whether grid lines are shown across the chart
