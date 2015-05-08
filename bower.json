@@ -1,0 +1,21 @@
+{
+	"name": "Chart.Scatter.js",
+	"version": "1.0.1",
+	"description": "Scatter chart type for the Chart.js library",
+	"author": "dima117",
+	"main": "Chart.Scatter.js",
+	"license": "MIT",
+	"homepage": "https://github.com/dima117/Chart.Scatter",
+	"ignore": [
+		"*",
+		"!Chart.Scatter.js",
+		"!Chart.Scatter.min.js",
+		"!Chart.Scatter.min.js.gzip",
+		"!Chart.Scatter.min.js.map",
+		"!LICENSE.md",
+		"!README.md"
+	],
+	"dependencies": {
+		"Chart.js": "~1.0.2"
+	}
+}
