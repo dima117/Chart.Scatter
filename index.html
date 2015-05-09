@@ -84,14 +84,42 @@
 &lt;script src="Chart.Scatter.js">&lt;/script>
 </pre>
 				<p>
+					Alternatively you can use an AMD loader.
+				</p>
+				<pre>
+// Using requirejs
+require(['Chart', 'path/to/Chart.Scatter'], function(Chart){
+    
+	...
+});
+</pre>
+				<p>
+					Please note, that Chart.Scatter addon requires to Chart.js module named "Chart".
+					If Chart.js module has another name in your application (not "Chart"),
+					you can adjust module name mapping.
+				</p>
+				<pre>
+// Using requirejs
+requirejs.config({
+	...
+	map: {
+		'*': { 'Chart': 'myAppChartjsName' }
+	}
+});
+</pre>
+				<p>
+					You can also grab Chart.Scatter.js using bower:
+					<pre>
+bower install Chart.Scatter.js --save
+</pre>
+				</p>
+				<p>
 					To create a chart, we need to instantiate the Chart class. To do this, we
 					need to pass in the 2d context of where we want to draw the chart. Here's an 
 					example.
 				</p>
 				<pre>
 &lt;canvas id="myChart" width="400" height="400">&lt;/canvas>
-
-...
 
 // Get the context of the canvas element we want to select
 var ctx = document.getElementById("myChart").getContext("2d");
@@ -112,11 +140,11 @@ new Chart(ctx).Scatter(data, options);
 			<div class="col-md-6">
 				<h3>Number scale</h3>
 				<div>
-					<canvas id="myChart" width="480" height="220"></canvas>
-					</div>
+					<canvas id="myChart" width="480" height="320"></canvas>
+				</div>
 				<h3>Date scale</h3>
 				<div>
-				<canvas id="myChartWithDates" width="480" height="220"></canvas>
+					<canvas id="myChartWithDates" width="480" height="320"></canvas>
 				</div>
 			</div>
 		</div>
@@ -273,9 +301,8 @@ var data = [
 				<h2>Date Format mask</h2>
 				<p>
 					Chart.Scatter uses the 
-					<a href="http://blog.stevenlevithan.com/archives/date-time-format" target="_blank">
-						date format library
-					</a> 
+					<a href="http://blog.stevenlevithan.com/archives/date-time-format" target="_blank">date format library
+					</a>
 					by Steven Levithan.
 				</p>
 				<table class="table">
