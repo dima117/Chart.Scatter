@@ -582,6 +582,25 @@
 		}
 	});
 
+	chartjs.ScatterDataSet = (function () {
+
+		var datasetCtr = function (datasetOptions, chartOptions) {
+
+			this.label = datasetOptions.label || null;
+			this.strokeColor = datasetOptions.strokeColor || chartOptions.datasetStrokeColor;
+			this.pointColor = datasetOptions.pointColor || datasetOptions.strokeColor || chartOptions.datasetStrokeColor;
+			this.pointStrokeColor = datasetOptions.pointStrokeColor || chartOptions.datasetPointStrokeColor;
+			this.points = [];
+
+		};
+
+		datasetCtr.prototype.addPoint = function (x, y) { }
+
+		return datasetCtr;
+	})();
+
+
+
 	chartjs.Type.extend({
 		name: "Scatter",
 
@@ -597,14 +616,7 @@
 			//Iterate through each of the datasets, and build this into a property of the chart
 			helpers.each(datasets, function (dataset) {
 
-				var datasetObject = {
-					label: dataset.label || null,
-					strokeColor: dataset.strokeColor || this.options.datasetStrokeColor,
-
-					pointColor: dataset.pointColor || dataset.strokeColor || this.options.datasetStrokeColor,
-					pointStrokeColor: dataset.pointStrokeColor || this.options.datasetPointStrokeColor,
-					points: []
-				};
+				var datasetObject = new chartjs.ScatterDataSet(dataset, this.options);
 
 				this.datasets.push(datasetObject);
 
@@ -846,7 +858,7 @@
 			}
 		},
 
-		_drawMessage: function(message) {
+		_drawMessage: function (message) {
 
 			var ctx = this.chart.ctx,
 				width = this.chart.width,
@@ -931,7 +943,7 @@
 				// update view params
 				this.scale.fit();
 
-				this._forEachDataset(function(dataset) {
+				this._forEachDataset(function (dataset) {
 
 					this.scale.updatePoints(dataset.points, ease);
 
@@ -954,7 +966,7 @@
 				// draw points
 				if (this.options.pointDot) {
 
-					this._forEachPoint(function(point) { point.draw(); });
+					this._forEachPoint(function (point) { point.draw(); });
 				}
 			} else {
 
