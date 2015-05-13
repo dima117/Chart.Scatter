@@ -40,6 +40,20 @@
 
 					return dateFormat(date, dFormat || "mmm d", useUtc);
 				}
+			},
+
+			getElementOrDefault: function (array, index, defaultValue) {
+
+				return index >= 0 && index < array.length
+					? array[index]
+					: defaultValue;
+			},
+
+			applyRange: function (value, min, max) {
+
+				return value > max ? max
+					: value < min ? min
+					: value;
 			}
 		};
 
@@ -207,20 +221,6 @@
 
 		api: {
 
-			getElementOrDefault: function (array, index, defaultValue) {
-
-				return index >= 0 && index < array.length
-					? array[index]
-					: defaultValue;
-			},
-
-			applyRange: function (value, min, max) {
-
-				return value > max ? max
-					: value < min ? min
-					: value;
-			},
-
 			calculateControlPoints: function (prev, current, next, range, tension) {
 
 				var tensionBefore = !!prev ? tension : 0;
@@ -250,8 +250,8 @@
 				};
 
 				// Cap inner bezier handles to the upper/lower scale bounds
-				result.before.y = this.applyRange(result.before.y, range.ymin, range.ymax);
-				result.after.y = this.applyRange(result.after.y, range.ymin, range.ymax);
+				result.before.y = hlp.applyRange(result.before.y, range.ymin, range.ymax);
+				result.after.y = hlp.applyRange(result.after.y, range.ymin, range.ymax);
 
 				return result;
 			},
@@ -346,9 +346,9 @@
 
 			for (var i = 0; i < dataSetPoints.length; i++) {
 
-				var current = this.api.getElementOrDefault(dataSetPoints, i);
-				var prev = this.api.getElementOrDefault(dataSetPoints, i - 1);
-				var next = this.api.getElementOrDefault(dataSetPoints, i + 1);
+				var current = hlp.getElementOrDefault(dataSetPoints, i);
+				var prev = hlp.getElementOrDefault(dataSetPoints, i - 1);
+				var next = hlp.getElementOrDefault(dataSetPoints, i + 1);
 
 				var obj = this.api.calculateControlPoints(prev, current, next, this.dataRange, tension);
 
@@ -610,6 +610,24 @@
 			var point = this._createNewPoint();
 			this._setPointData(point, x, y);
 			this.points.push(point);
+		};
+
+		datasetCtr.prototype.setPointData = function (index, x, y) {
+
+			var point = hlp.getElementOrDefault(this.points, index);
+
+			if (point) {
+
+				this._setPointData(point, x, y);
+			}
+		};
+
+		datasetCtr.prototype.removePoint = function (index) {
+
+			if (index >= 0 && index < this.points.length) {
+
+				this.points.splice(index, 1);
+			}
 		};
 
 		datasetCtr.prototype._createNewPoint = function(x, y) {
