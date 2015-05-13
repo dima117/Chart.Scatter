@@ -298,6 +298,27 @@ var data = [
     }
   ];
 </pre>
+				<h2>Dataset API</h2>
+				<p>
+					You can change the chart data, using <code>datasets</code> collection of the chart.
+					Use the methods of it elements: <code>addPoint</code>, <code>setPointData</code><code>removePoint</code>.
+				</p>
+<pre>
+<strong>// Add a new point { x: 5, y: 7 }</strong>
+myChart.datasets[0].addPoint(5, 7);
+
+<strong>// Set point data { x: 11, y: 4 } at index 3</strong>
+myChart.datasets[0].setPointData(3, 11, 4);
+
+<strong>// Remove the point at index 0</strong>
+myChart.datasets[0].removePoint(0);
+</pre>
+				<p>
+					After all changes call the <code>update</code> method of the chart for render your chart with new data.
+				</p>
+				<pre>
+myChart.update();
+</pre>
 				<h2>Date Format mask</h2>
 				<p>
 					Chart.Scatter uses the 
