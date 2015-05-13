@@ -16,9 +16,9 @@
 			return Math.floor(Math.random() * (max - min + 1)) + min;
 		}
 
-		var data = [], data2 = [];
+		var data = [], data2 = [], ii = 0;
 
-		for (var ii = 0; ii < 5; ii++) {
+		for (ii = 0; ii < 5; ii++) {
 
 			data.push({
 				x: Date.parse("2015-04-27 04:00:00 +0300") + ii * 24 * 3600000,
@@ -32,7 +32,7 @@
 		}
 
 		var ctx = document.getElementById("header-canvas").getContext("2d");
-		var chart = new Chart(ctx).Scatter([{ label: "dataset 1", data: data }, { label: "dataset 2", data: data2 }], {
+		var myChart = new Chart(ctx).Scatter([{ label: "dataset 1", data: data }, { label: "dataset 2", data: data2 }], {
 			showScale: true,
 			scaleShowLabels: true,
 			scaleShowHorizontalLines: true,
@@ -50,7 +50,17 @@
 			scaleType: 'date'
 		});
 
-		document.getElementById("legend").innerHTML = chart.generateLegend();
+		document.getElementById("legend").innerHTML = myChart.generateLegend();
+
+		//setInterval(function () {
+
+		//	var arg = Date.parse("2015-04-27 04:00:00 +0300") + ii * 24 * 3600000;
+
+		//	myChart.datasets[0].addPoint(arg, getRandomInt(0, 100));
+		//	myChart.datasets[1].addPoint(arg, getRandomInt(0, 100));
+		//	myChart.update(), ii++;
+
+		//}, 2000);
 	</script>
 </body>
 </html>

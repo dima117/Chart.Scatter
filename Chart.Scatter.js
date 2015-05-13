@@ -584,17 +584,66 @@
 
 	chartjs.ScatterDataSet = (function () {
 
-		var datasetCtr = function (datasetOptions, chartOptions) {
+		var datasetCtr = function (datasetOptions, chartOptions, chart, scale) {
+
+			this.chart = chart;
+			this.scale = scale;
 
 			this.label = datasetOptions.label || null;
 			this.strokeColor = datasetOptions.strokeColor || chartOptions.datasetStrokeColor;
 			this.pointColor = datasetOptions.pointColor || datasetOptions.strokeColor || chartOptions.datasetStrokeColor;
 			this.pointStrokeColor = datasetOptions.pointStrokeColor || chartOptions.datasetPointStrokeColor;
-			this.points = [];
 
+			this.pointDot = chartOptions.pointDot;
+			this.pointDotRadius = chartOptions.pointDotRadius;
+			this.pointHitDetectionRadius = chartOptions.pointHitDetectionRadius;
+			this.pointDotStrokeWidth = chartOptions.pointDotStrokeWidth;
+
+			this.scaleArgLabel = chartOptions.scaleArgLabel;
+			this.scaleLabel = chartOptions.scaleLabel;
+
+			this.points = [];
 		};
 
-		datasetCtr.prototype.addPoint = function (x, y) { }
+		datasetCtr.prototype.addPoint = function(x, y) {
+
+			var point = this._createNewPoint();
+			this._setPointData(point, x, y);
+			this.points.push(point);
+		};
+
+		datasetCtr.prototype._createNewPoint = function(x, y) {
+
+			return new chartjs.Point({
+
+				ctx: this.chart.ctx,
+				datasetLabel: this.label,
+
+				// point
+				display: this.pointDot,
+				radius: this.pointDotRadius,
+				hitDetectionRadius: this.pointHitDetectionRadius,
+				strokeWidth: this.pointDotStrokeWidth,
+
+				// colors
+				strokeColor: this.pointStrokeColor,
+				highlightStroke: this.pointColor,
+				fillColor: this.pointColor,
+				highlightFill: this.pointStrokeColor
+			});
+		};
+
+		datasetCtr.prototype._setPointData = function (point, x, y) {
+
+			var formattedArg = this.scale.argToString(+x),
+				formattedValue = +y + "";
+
+			point.arg = +x;
+			point.value = +y;
+
+			point.argLabel = helpers.template(this.scaleArgLabel, { value: formattedArg }),
+			point.valueLabel = helpers.template(this.scaleLabel, { value: formattedValue });
+		};
 
 		return datasetCtr;
 	})();
@@ -616,45 +665,16 @@
 			//Iterate through each of the datasets, and build this into a property of the chart
 			helpers.each(datasets, function (dataset) {
 
-				var datasetObject = new chartjs.ScatterDataSet(dataset, this.options);
+				var datasetObject = new chartjs.ScatterDataSet(dataset, this.options, this.chart, this.scale);
 
 				this.datasets.push(datasetObject);
 
+				this.hasData |= !!dataset.data.length;
+
 				helpers.each(dataset.data, function (dataPoint) {
 
-					this.hasData = true;
-
-					var formattedArg = this.scale.argToString(+dataPoint.x),
-						formattedValue = +dataPoint.y + "";
-
-					var argLabel = helpers.template(this.options.scaleArgLabel, { value: formattedArg }),
-						valueLabel = helpers.template(this.options.scaleLabel, { value: formattedValue });
-
-					//Add a new point for each piece of data, passing any required data to draw.
-					datasetObject.points.push(new chartjs.Point({
-
-						ctx: this.chart.ctx,
-
-						argLabel: argLabel,
-						valueLabel: valueLabel,
-
-						arg: +dataPoint.x,
-						value: +dataPoint.y,
-						datasetLabel: dataset.label || null,
-
-						// point
-						display: this.options.pointDot,
-						radius: this.options.pointDotRadius,
-						hitDetectionRadius: this.options.pointHitDetectionRadius,
-						strokeWidth: this.options.pointDotStrokeWidth,
-
-						// colors
-						strokeColor: datasetObject.pointStrokeColor,
-						highlightStroke: datasetObject.pointColor,
-						fillColor: datasetObject.pointColor,
-						highlightFill: datasetObject.pointStrokeColor
-					}));
-				}, this);
+					datasetObject.addPoint(dataPoint.x, dataPoint.y);
+				});
 
 			}, this);
 
