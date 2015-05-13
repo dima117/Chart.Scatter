@@ -677,10 +677,7 @@
 				});
 
 			}, this);
-
-			var dataRange = this._calculateRange();
-			this.scale.setDataRange(dataRange);
-
+			
 			//Set up tooltip events on the chart
 			if (this.options.showTooltips) {
 
@@ -703,7 +700,10 @@
 				});
 			}
 
-			this.render();
+			var dataRange = this._calculateRange();
+			this.scale.setDataRange(dataRange);
+
+			this.update();
 		},
 
 		_initScale: function () {
@@ -954,6 +954,14 @@
 			//		ctx.stroke();
 			//	});
 			//}
+		},
+
+		update: function () {
+
+			var dataRange = this._calculateRange();
+			this.scale.setDataRange(dataRange);
+
+			this.render();
 		},
 
 		draw: function (ease) {
