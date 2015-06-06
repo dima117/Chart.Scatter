@@ -48,7 +48,12 @@
 			useUtc: true,
 			pointDot: false,
 			scaleType: 'date',
-			animation: false
+			animation: false,
+
+			scaleOverride: true,
+			scaleSteps: 3,
+			scaleStepWidth: 50,
+			scaleStartValue: 0
 		});
 
 		document.getElementById("legend").innerHTML = myChart.generateLegend();

@@ -273,12 +273,23 @@
 
 		calculateYscaleRange: function () {
 
-			this.yScaleRange = helpers.calculateScaleRange(
-				[this.dataRange.ymin, this.dataRange.ymax],
-				this.chart.height,
-				this.fontSize,
-				this.beginAtZero,	// beginAtZero,
-				this.integersOnly); // integersOnly
+			if (this.scaleOverride) {
+
+				this.yScaleRange = {
+					steps: this.scaleSteps,
+					stepValue: this.scaleStepWidth,
+					min: this.scaleStartValue,
+					max: this.scaleStartValue + (this.scaleSteps * this.scaleStepWidth)
+				};
+			} else {
+
+				this.yScaleRange = helpers.calculateScaleRange(
+									[this.dataRange.ymin, this.dataRange.ymax],
+									this.chart.height,
+									this.fontSize,
+									this.beginAtZero,	// beginAtZero,
+									this.integersOnly); // integersOnly				
+			}
 		},
 
 		calculateXscaleRange: function () {
@@ -605,7 +616,7 @@
 			this.points = [];
 		};
 
-		datasetCtr.prototype.addPoint = function(x, y) {
+		datasetCtr.prototype.addPoint = function (x, y) {
 
 			var point = this._createNewPoint();
 			this._setPointData(point, x, y);
@@ -630,7 +641,7 @@
 			}
 		};
 
-		datasetCtr.prototype._createNewPoint = function(x, y) {
+		datasetCtr.prototype._createNewPoint = function (x, y) {
 
 			return new chartjs.Point({
 
@@ -666,8 +677,6 @@
 		return datasetCtr;
 	})();
 
-
-
 	chartjs.Type.extend({
 		name: "Scatter",
 
@@ -695,7 +704,7 @@
 				});
 
 			}, this);
-			
+
 			//Set up tooltip events on the chart
 			if (this.options.showTooltips) {
 
@@ -747,6 +756,12 @@
 				lineWidth: this.options.scaleLineWidth,
 				lineColor: this.options.scaleLineColor,
 				display: this.options.showScale,
+
+				// range
+				scaleOverride: this.options.scaleOverride,
+				scaleSteps: this.options.scaleSteps,
+				scaleStepWidth: this.options.scaleStepWidth,
+				scaleStartValue: this.options.scaleStartValue,
 
 				// dates
 				useUtc: this.options.useUtc,
