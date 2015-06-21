@@ -688,6 +688,10 @@
 			this.datasets = [];
 			this.scale = this._initScale();
 
+			// Compatibility layer
+			if (datasets.datasets) {
+				datasets = datasets.datasets;
+			}
 
 			//Iterate through each of the datasets, and build this into a property of the chart
 			helpers.each(datasets, function (dataset) {
