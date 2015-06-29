@@ -616,20 +616,20 @@
 			this.points = [];
 		};
 
-		datasetCtr.prototype.addPoint = function (x, y) {
+		datasetCtr.prototype.addPoint = function (x, y, r) {
 
 			var point = this._createNewPoint();
-			this._setPointData(point, x, y);
+			this._setPointData(point, x, y, r);
 			this.points.push(point);
 		};
 
-		datasetCtr.prototype.setPointData = function (index, x, y) {
+		datasetCtr.prototype.setPointData = function (index, x, y, r) {
 
 			var point = hlp.getElementOrDefault(this.points, index);
 
 			if (point) {
 
-				this._setPointData(point, x, y);
+				this._setPointData(point, x, y, r);
 			}
 		};
 
@@ -641,7 +641,7 @@
 			}
 		};
 
-		datasetCtr.prototype._createNewPoint = function (x, y) {
+		datasetCtr.prototype._createNewPoint = function (x, y, r) {
 
 			return new chartjs.Point({
 
@@ -650,7 +650,7 @@
 
 				// point
 				display: this.pointDot,
-				radius: this.pointDotRadius,
+				radius: +r * this.pointDotRadius,
 				hitDetectionRadius: this.pointHitDetectionRadius,
 				strokeWidth: this.pointDotStrokeWidth,
 
@@ -662,7 +662,7 @@
 			});
 		};
 
-		datasetCtr.prototype._setPointData = function (point, x, y) {
+		datasetCtr.prototype._setPointData = function (point, x, y, r) {
 
 			var formattedArg = this.scale.argToString(+x),
 				formattedValue = +y + "";
@@ -670,7 +670,10 @@
 			point.arg = +x;
 			point.value = +y;
 
-			point.argLabel = helpers.template(this.scaleArgLabel, { value: formattedArg }),
+      point.size = +r;  // for use in templates
+      point.radius = +r * this.pointDotRadius;
+
+      point.argLabel = helpers.template(this.scaleArgLabel, { value: formattedArg }),
 			point.valueLabel = helpers.template(this.scaleLabel, { value: formattedValue });
 		};
 
@@ -704,7 +707,7 @@
 
 				helpers.each(dataset.data, function (dataPoint) {
 
-					datasetObject.addPoint(dataPoint.x, dataPoint.y);
+					datasetObject.addPoint(dataPoint.x, dataPoint.y, dataPoint.r || 1);
 				});
 
 			}, this);

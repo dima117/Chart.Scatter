@@ -267,11 +267,11 @@ pointHitDetectionRadius: <strong>4</strong>,
 <strong>// TEMPLATES</strong>
 
 // Interpolated JS string - can access point fields: 
-// argLabel, valueLabel, arg, value, datasetLabel
+// argLabel, valueLabel, arg, value, datasetLabel, size
 tooltipTemplate: <strong>"<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%=argLabel%>; <%=valueLabel%>"</strong>
 
 // Interpolated JS string - can access point fields: 
-// argLabel, valueLabel, arg, value, datasetLabel
+// argLabel, valueLabel, arg, value, datasetLabel, size
 multiTooltipTemplate: <strong>"<%=argLabel%>; <%=valueLabel%>",</strong>
 
 // Interpolated JS string - can access all chart fields
@@ -292,7 +292,7 @@ var data = [
         { x: 19, y: 65 }, 
         { x: 27, y: 59 }, 
         { x: 28, y: 69 }, 
-        { x: 40, y: 81 },
+        { x: 40, y: 81, r:3 },
         { x: 48, y: 56 }
       ]
     },
@@ -306,7 +306,7 @@ var data = [
         { x: 27, y: 69 }, 
         { x: 28, y: 70 }, 
         { x: 40, y: 31 },
-        { x: 48, y: 76 }, 
+        { x: 48, y: 76, r:3},
         { x: 52, y: 23 }, 
         { x: 24, y: 32 }
       ]
@@ -327,6 +327,13 @@ myChart.datasets[0].setPointData(3, 11, 4);
 
 <strong>// Remove the point at index 0</strong>
 myChart.datasets[0].removePoint(0);
+</pre>
+<p>
+  A point can also have a radius specified by <code>r</code>.  It is drawn as a multiple of <code>pointDotRadius</code>.  The default radius is 1.
+</p>
+<pre>
+<strong>// Add a new point (with radius) { x: 5, y: 7, r:2 }</strong>
+myChart.datasets[0].addPoint(5, 7, 2);
 </pre>
 				<p>
 					After all changes call the <code>update</code> method of the chart for render your chart with new data.
@@ -482,8 +489,8 @@ myChart.update();
 					label: 'complex-1',
 					strokeColor: '#F16220',
 					data: [
-						{ x: 19, y: 65 }, { x: 27, y: 59 }, { x: 28, y: 69 }, { x: 40, y: 81 },
-						{ x: 48, y: 56 }, { x: 86, y: 55 }, { x: 90, y: 40 }, { x: 95, y: 60 }
+						{ x: 19, y: 65 }, { x: 27, y: 59 }, { x: 28, y: 69 }, { x: 40, y: 81, r:3 },
+						{ x: 48, y: 56 }, { x: 86, y: 55 }, { x: 90, y: 40, r:2 }, { x: 95, y: 60 }
 					]
 				},
 				{
@@ -491,7 +498,7 @@ myChart.update();
 					strokeColor: '#007ACC',
 					data: [
 						{ x: 19, y: 75 }, { x: 27, y: 69 }, { x: 28, y: 70 }, { x: 40, y: 31 },
-						{ x: 48, y: 76 }, { x: 52, y: 23 }, { x: 24, y: 32 },
+						{ x: 48, y: 76, r:3 }, { x: 52, y: 23, r:2 }, { x: 24, y: 32 },
 						{ x: 86, y: 45 }, { x: 90, y: 50 }
 					]
 				}
