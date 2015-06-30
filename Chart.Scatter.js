@@ -17,7 +17,6 @@
 
 	var helpers = chartjs.helpers,
 		hlp = {
-
 			formatDateValue: function (date, tFormat, dFormat, useUtc) {
 
 				date = new Date(+date);
@@ -54,7 +53,34 @@
 				return value > max ? max
 					: value < min ? min
 					: value;
-			}
+			},
+			ScatterPoint: chartjs.Point.extend({
+
+				inRange: function (chartX, chartY) {
+					var hitDetectionRange = this.hitDetectionRadius + this.radius * this.size;
+					return ((Math.pow(chartX - this.x, 2) + Math.pow(chartY - this.y, 2)) < Math.pow(hitDetectionRange, 2));
+				},
+
+				draw: function () {
+
+					if (this.display && this.size > 0) {
+
+						var ctx = this.ctx;
+						ctx.beginPath();
+
+						ctx.arc(this.x, this.y, this.size * this.radius, 0, Math.PI * 2);
+						ctx.closePath();
+
+						ctx.strokeStyle = this.strokeColor;
+						ctx.lineWidth = this.strokeWidth;
+
+						ctx.fillStyle = this.fillColor;
+
+						ctx.fill();
+						ctx.stroke();
+					}
+				}
+			})
 		};
 
 	var dateFormat = function () {
@@ -161,6 +187,7 @@
 		// scaleShowLabels: true,					// Boolean - Whether to show labels on the scale
 		// scaleLabel: "<%=value%>",				// Interpolated JS string - can access value
 		scaleArgLabel: "<%=value%>",				// Interpolated JS string - can access value
+		scaleSizeLabel: "<%=value%>",				// Interpolated JS string - can access value
 
 		emptyDataMessage: "chart has no data",		// String - Message for empty data
 
@@ -612,11 +639,15 @@
 
 			this.scaleArgLabel = chartOptions.scaleArgLabel;
 			this.scaleLabel = chartOptions.scaleLabel;
+			this.scaleSizeLabel = chartOptions.scaleSizeLabel;
 
 			this.points = [];
 		};
 
 		datasetCtr.prototype.addPoint = function (x, y, r) {
+
+			// default size
+			r = arguments.length < 3 ? 1 : r;
 
 			var point = this._createNewPoint();
 			this._setPointData(point, x, y, r);
@@ -624,6 +655,9 @@
 		};
 
 		datasetCtr.prototype.setPointData = function (index, x, y, r) {
+
+			// default size
+			r = arguments.length < 4 ? 1 : r;
 
 			var point = hlp.getElementOrDefault(this.points, index);
 
@@ -641,16 +675,16 @@
 			}
 		};
 
-		datasetCtr.prototype._createNewPoint = function (x, y, r) {
+		datasetCtr.prototype._createNewPoint = function () {
 
-			return new chartjs.Point({
+			return new hlp.ScatterPoint({
 
 				ctx: this.chart.ctx,
 				datasetLabel: this.label,
 
 				// point
 				display: this.pointDot,
-				radius: +r * this.pointDotRadius,
+				radius: this.pointDotRadius,
 				hitDetectionRadius: this.pointHitDetectionRadius,
 				strokeWidth: this.pointDotStrokeWidth,
 
@@ -665,16 +699,16 @@
 		datasetCtr.prototype._setPointData = function (point, x, y, r) {
 
 			var formattedArg = this.scale.argToString(+x),
-				formattedValue = +y + "";
+				formattedValue = +y + "",
+				formattedSize = +r + "";
 
 			point.arg = +x;
 			point.value = +y;
+			point.size = +r;  // for use in templates
 
-      point.size = +r;  // for use in templates
-      point.radius = +r * this.pointDotRadius;
-
-      point.argLabel = helpers.template(this.scaleArgLabel, { value: formattedArg }),
+			point.argLabel = helpers.template(this.scaleArgLabel, { value: formattedArg }),
 			point.valueLabel = helpers.template(this.scaleLabel, { value: formattedValue });
+			point.sizeLabel = helpers.template(this.scaleSizeLabel, { value: formattedSize });
 		};
 
 		return datasetCtr;

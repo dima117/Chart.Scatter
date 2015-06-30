@@ -140,11 +140,15 @@ new Chart(ctx).Scatter(data, options);
 			<div class="col-md-6">
 				<h3>Number scale</h3>
 				<div>
-					<canvas id="myChart" width="480" height="320"></canvas>
+					<canvas id="myChart" width="430" height="220"></canvas>
 				</div>
 				<h3>Date scale</h3>
 				<div>
-					<canvas id="myChartWithDates" width="480" height="320"></canvas>
+					<canvas id="myChartWithDates" width="430" height="220"></canvas>
+				</div>
+				<h3>Custom point radius</h3>
+				<div>
+					<canvas id="myBubbleChart" width="430" height="220"></canvas>
 				</div>
 			</div>
 		</div>
@@ -281,6 +285,11 @@ legendTemplate: <strong>"&lt;ul class=\"&lt;%=name.toLowerCase()%>-legend\">&lt;
 
 			<div class="col-md-6">
 				<h2>Data structure</h2>
+				<p>
+					Any point can have <code>x</code>, <code>y</code>, <code>r</code> fields.
+					The fields named "x" and "y" are the coordinates of the point. Optional field "r" is a multiplier
+					for the point radius (<code>pointDotRadius</code>). The default multiplier is 1.
+				</p>
 				<pre>
 var data = [
     {
@@ -292,7 +301,7 @@ var data = [
         { x: 19, y: 65 }, 
         { x: 27, y: 59 }, 
         { x: 28, y: 69 }, 
-        { x: 40, y: 81, r:3 },
+        { x: 40, y: 81 },
         { x: 48, y: 56 }
       ]
     },
@@ -302,13 +311,13 @@ var data = [
       pointColor: '#007ACC',
       pointStrokeColor: '#fff',
       data: [
-        { x: 19, y: 75 }, 
-        { x: 27, y: 69 }, 
-        { x: 28, y: 70 }, 
-        { x: 40, y: 31 },
-        { x: 48, y: 76, r:3},
-        { x: 52, y: 23 }, 
-        { x: 24, y: 32 }
+        { x: 19, y: 75, r: 4 }, 
+        { x: 27, y: 69, r: 7 }, 
+        { x: 28, y: 70, r: 5 }, 
+        { x: 40, y: 31, r: 3 },
+        { x: 48, y: 76, r: 6 },
+        { x: 52, y: 23, r: 3 }, 
+        { x: 24, y: 32, r: 4 }
       ]
     }
   ];
@@ -316,24 +325,23 @@ var data = [
 				<h2>Dataset API</h2>
 				<p>
 					You can change the chart data, using <code>datasets</code> collection of the chart.
-					Use the methods of it elements: <code>addPoint</code>, <code>setPointData</code><code>removePoint</code>.
+					Use the methods of it elements: <code>addPoint</code>, <code>setPointData</code>, <code>removePoint</code>.
 				</p>
 <pre>
-<strong>// Add a new point { x: 5, y: 7 }</strong>
+<strong>// Add a new point { x: 5, y: 7 } (with radius)</strong>
 myChart.datasets[0].addPoint(5, 7);
 
-<strong>// Set point data { x: 11, y: 4 } at index 3</strong>
+<strong>// Add a new point { x: 5, y: 7, r: 4 }</strong>
+myChart.datasets[0].addPoint(5, 7, 4);
+
+<strong>// Set point data { x: 11, y: 4 } at index 3 (with radius)</strong>
 myChart.datasets[0].setPointData(3, 11, 4);
+
+<strong>// Set point data { x: 11, y: 4, r: 2 } at index 3</strong>
+myChart.datasets[0].setPointData(3, 11, 4, 2);
 
 <strong>// Remove the point at index 0</strong>
 myChart.datasets[0].removePoint(0);
-</pre>
-<p>
-  A point can also have a radius specified by <code>r</code>.  It is drawn as a multiple of <code>pointDotRadius</code>.  The default radius is 1.
-</p>
-<pre>
-<strong>// Add a new point (with radius) { x: 5, y: 7, r:2 }</strong>
-myChart.datasets[0].addPoint(5, 7, 2);
 </pre>
 				<p>
 					After all changes call the <code>update</code> method of the chart for render your chart with new data.
@@ -448,7 +456,7 @@ myChart.update();
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
 	<script src="Chart.Core.min.js"></script>
-	<script src="Chart.Scatter.min.js"></script>
+	<script src="Chart.Scatter.js"></script>
 
 	<script>
 
@@ -489,8 +497,8 @@ myChart.update();
 					label: 'complex-1',
 					strokeColor: '#F16220',
 					data: [
-						{ x: 19, y: 65 }, { x: 27, y: 59 }, { x: 28, y: 69 }, { x: 40, y: 81, r:3 },
-						{ x: 48, y: 56 }, { x: 86, y: 55 }, { x: 90, y: 40, r:2 }, { x: 95, y: 60 }
+						{ x: 19, y: 65 }, { x: 27, y: 59 }, { x: 28, y: 69 }, { x: 40, y: 81 },
+						{ x: 48, y: 56 }, { x: 86, y: 55 }, { x: 90, y: 40 }, { x: 95, y: 60 }
 					]
 				},
 				{
@@ -498,14 +506,14 @@ myChart.update();
 					strokeColor: '#007ACC',
 					data: [
 						{ x: 19, y: 75 }, { x: 27, y: 69 }, { x: 28, y: 70 }, { x: 40, y: 31 },
-						{ x: 48, y: 76, r:3 }, { x: 52, y: 23, r:2 }, { x: 24, y: 32 },
+						{ x: 48, y: 76 }, { x: 52, y: 23 }, { x: 24, y: 32 },
 						{ x: 86, y: 45 }, { x: 90, y: 50 }
 					]
 				}
 			];
 
-			var ctx = document.getElementById("myChart").getContext("2d");
-			var myLineChart = new Chart(ctx).Scatter(data2, {
+			var ctx2 = document.getElementById("myChart").getContext("2d");
+			var myLineChart = new Chart(ctx2).Scatter(data2, {
 				bezierCurve: true,
 				showTooltips: true,
 				scaleShowHorizontalLines: true,
@@ -551,14 +559,36 @@ myChart.update();
 					]
 				}];
 
-			var ctx2 = document.getElementById("myChartWithDates").getContext("2d");
-			var myDateLineChart = new Chart(ctx2).Scatter(data3, {
+			var ctx3 = document.getElementById("myChartWithDates").getContext("2d");
+			var myDateLineChart = new Chart(ctx3).Scatter(data3, {
 				bezierCurve: true,
 				showTooltips: true,
 				scaleShowHorizontalLines: true,
 				scaleShowLabels: true,
 				scaleType: "date",
 				scaleLabel: "<%=value%>°C"
+			});
+
+
+			var data4 = [
+				{
+					label: 'Bubble chart example',
+					strokeColor: 'rgba(77, 180, 73, 0.3)',
+					data: [
+						{ x: 1, y: 10, r: 7 }, { x: 2, y: 12, r: 5 }, { x: 3, y: 14, r: 10 }, { x: 4, y: 18, r: 6 },
+						{ x: 5, y: 26, r: 9 }, { x: 6, y: 42, r: 4 }, { x: 7, y: 60, r: 8 }
+					]
+				}
+			];
+
+			var ctx4 = document.getElementById("myBubbleChart").getContext("2d");
+			var myBubbleChart = new Chart(ctx4).Scatter(data4, {
+				bezierCurve: true,
+				showTooltips: true,
+				scaleShowHorizontalLines: true,
+				scaleShowLabels: true,
+				scaleBeginAtZero: true,
+				datasetStroke: false
 			});
 		});
 	</script>
