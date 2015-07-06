@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.22823.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5EC72027-6CC3-4338-A076-15833808929C}"
 	ProjectSection(SolutionItems) = preProject
 		bower.json = bower.json
@@ -11,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Chart.Scatter.js = Chart.Scatter.js
 		Chart.Scatter.min.js = Chart.Scatter.min.js
 		index.html = index.html
+		package.json = package.json
 		README.md = README.md
 		test.html = test.html
 	EndProjectSection

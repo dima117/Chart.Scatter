@@ -1,0 +1,24 @@
+{
+	"name": "chart.js-scatter",
+	"version": "1.1.2",
+	"description": "Scatter chart plugin for Chart.js",
+	"main": "Chart.Scatter.js",
+	"dependencies": {
+		"chart.js": "~1.0.2"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/dima117/Chart.Scatter.git"
+	},
+	"keywords": [
+		"chart",
+		"chartjs",
+		"scatter"
+	],
+	"author": "Dmitry Andriyanov <dima117a@gmail.com> (https://github.com/dima117)",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/dima117/Chart.Scatter/issues"
+	},
+	"homepage": "http://dima117.github.io/Chart.Scatter"
+}
