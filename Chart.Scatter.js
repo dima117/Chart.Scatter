@@ -286,7 +286,7 @@
 			generateLabels: function (templateString, numberOfSteps, graphMin, stepValue) {
 
 				var labelsArray = new Array(numberOfSteps + 1),
-						stepDecimalPlaces = helpers.getDecimalPlaces(this.stepValue);
+						stepDecimalPlaces = helpers.getDecimalPlaces(stepValue);
 
 				if (templateString) {
 
