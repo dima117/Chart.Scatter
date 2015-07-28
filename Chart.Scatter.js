@@ -285,12 +285,14 @@
 
 			generateLabels: function (templateString, numberOfSteps, graphMin, stepValue) {
 
-				var labelsArray = new Array(numberOfSteps + 1);
+				var labelsArray = new Array(numberOfSteps + 1),
+						stepDecimalPlaces = helpers.getDecimalPlaces(stepValue);
+
 				if (templateString) {
 
 					helpers.each(labelsArray, function (val, index) {
 
-						labelsArray[index] = helpers.template(templateString, { value: (graphMin + (stepValue * (index))) });
+						labelsArray[index] = helpers.template(templateString, { value: (graphMin + (stepValue * (index))).toFixed(stepDecimalPlaces) });
 
 					});
 				}
