@@ -873,7 +873,7 @@
 
 					}, this);
 
-					new Chart.MultiTooltip({
+					new chartjs.MultiTooltip({
 						x: Math.round(tooltipPosition.x),
 						y: Math.round(tooltipPosition.y),
 						xPadding: this.options.tooltipXPadding,
