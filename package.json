@@ -20,5 +20,8 @@
 	"bugs": {
 		"url": "https://github.com/dima117/Chart.Scatter/issues"
 	},
-	"homepage": "http://dima117.github.io/Chart.Scatter"
+	"homepage": "http://dima117.github.io/Chart.Scatter",
+	"browser": {
+		"Chart": "chart.js"
+	},
 }
