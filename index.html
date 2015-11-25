@@ -185,7 +185,7 @@ scaleArgLabel: <strong>"<%=value%>"</strong>,
 // String - Message for empty data
 emptyDataMessage: <strong>"chart has no data"</strong>,		
 
-<strong>// SCALE</strong>
+<strong>// GRID LINES</strong>
 
 // Boolean - Whether grid lines are shown across the chart
 scaleShowGridLines: <strong>true</strong>,
@@ -202,19 +202,34 @@ scaleShowHorizontalLines: <strong>true</strong>,
 // Boolean - Whether to show vertical lines (except Y axis)
 scaleShowVerticalLines: <strong>true</strong>,
 
-<strong>// SCALE RANGE</strong>
+<strong>// HORIZONTAL SCALE RANGE</strong>
 
-// Boolean - If we want to override with a hard coded scale
+// Boolean - If we want to override with a hard coded x scale
+xScaleOverride: <strong>false</strong>,
+
+// ** Required if scaleOverride is true **
+// Number - The number of steps in a hard coded x scale
+xScaleSteps: <strong>null</strong>,
+
+// Number - The value jump in the hard coded x scale
+xScaleStepWidth: <strong>null</strong>,
+
+// Number - The x scale starting value
+xScaleStartValue: <strong>null</strong>,
+
+<strong>// VERTICAL SCALE RANGE</strong>
+
+// Boolean - If we want to override with a hard coded y scale
 scaleOverride: <strong>false</strong>,
 
 // ** Required if scaleOverride is true **
-// Number - The number of steps in a hard coded scale
+// Number - The number of steps in a hard coded y scale
 scaleSteps: <strong>null</strong>,
 
-// Number - The value jump in the hard coded scale
+// Number - The value jump in the hard coded y scale
 scaleStepWidth: <strong>null</strong>,
 
-// Number - The scale starting value
+// Number - The y scale starting value
 scaleStartValue: <strong>null</strong>,
 
 <strong>// DATE SCALE</strong>

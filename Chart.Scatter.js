@@ -323,12 +323,23 @@
 
 		calculateXscaleRange: function () {
 
-			this.xScaleRange = helpers.calculateScaleRange(
-				[this.dataRange.xmin, this.dataRange.xmax],
-				this.chart.width,
-				this.fontSize,
-				false,	// beginAtZero,
-				true); // integersOnly
+			if (this.xScaleOverride) {
+
+				this.xScaleRange = {
+					steps: this.xScaleSteps,
+					stepValue: this.xScaleStepWidth,
+					min: this.xScaleStartValue,
+					max: this.xScaleStartValue + (this.xScaleSteps * this.xScaleStepWidth)
+				};
+			} else {
+
+				this.xScaleRange = helpers.calculateScaleRange(
+					[this.dataRange.xmin, this.dataRange.xmax],
+					this.chart.width,
+					this.fontSize,
+					false,	// beginAtZero,
+					true); // integersOnly
+			}
 		},
 
 		generateYLabels: function () {
@@ -800,7 +811,13 @@
 				lineColor: this.options.scaleLineColor,
 				display: this.options.showScale,
 
-				// range
+				// y range
+				xScaleOverride: this.options.xScaleOverride,
+				xScaleSteps: this.options.xScaleSteps,
+				xScaleStepWidth: this.options.xScaleStepWidth,
+				xScaleStartValue: this.options.xScaleStartValue,
+
+				// y range
 				scaleOverride: this.options.scaleOverride,
 				scaleSteps: this.options.scaleSteps,
 				scaleStepWidth: this.options.scaleStepWidth,
