@@ -564,6 +564,9 @@
 
 			var maxSteps = drawingSize / (fontSize * 3.3);
 
+			// fix https://github.com/dima117/Chart.Scatter/issues/31
+			valueMax === valueMin && (valueMax++);
+
 			var valueRange = +valueMax - valueMin,
 				offset = this.useUtc ? 0 : new Date().getTimezoneOffset() * 60000,
 				min = +valueMin - offset,
