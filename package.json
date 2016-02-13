@@ -23,5 +23,5 @@
 	"homepage": "http://dima117.github.io/Chart.Scatter",
 	"browser": {
 		"Chart": "chart.js"
-	},
+	}
 }
