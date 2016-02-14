@@ -54,6 +54,16 @@
 					: value < min ? min
 					: value;
 			},
+
+			calculateFixedScaleRange: function(startValue, steps, stepWidth) {
+				return {
+					steps: steps,
+					stepValue: stepWidth,
+					min: startValue,
+					max: startValue + (steps * stepWidth)
+				};
+			},
+
 			ScatterPoint: chartjs.Point.extend({
 
 				inRange: function (chartX, chartY) {
@@ -304,20 +314,18 @@
 
 			if (this.scaleOverride) {
 
-				this.yScaleRange = {
-					steps: this.scaleSteps,
-					stepValue: this.scaleStepWidth,
-					min: this.scaleStartValue,
-					max: this.scaleStartValue + (this.scaleSteps * this.scaleStepWidth)
-				};
+				this.yScaleRange = hlp.calculateFixedScaleRange(
+					this.scaleStartValue,
+					this.scaleSteps,
+					this.scaleStepWidth);
 			} else {
 
 				this.yScaleRange = helpers.calculateScaleRange(
-									[this.dataRange.ymin, this.dataRange.ymax],
-									this.chart.height,
-									this.fontSize,
-									this.beginAtZero,	// beginAtZero,
-									this.integersOnly); // integersOnly				
+					[this.dataRange.ymin, this.dataRange.ymax],
+					this.chart.height,
+					this.fontSize,
+					this.beginAtZero,	// beginAtZero,
+					this.integersOnly); // integersOnly
 			}
 		},
 
@@ -325,12 +333,10 @@
 
 			if (this.xScaleOverride) {
 
-				this.xScaleRange = {
-					steps: this.xScaleSteps,
-					stepValue: this.xScaleStepWidth,
-					min: this.xScaleStartValue,
-					max: this.xScaleStartValue + (this.xScaleSteps * this.xScaleStepWidth)
-				};
+				this.xScaleRange = hlp.calculateFixedScaleRange(
+					this.xScaleStartValue,
+					this.xScaleSteps,
+					this.xScaleStepWidth);
 			} else {
 
 				this.xScaleRange = helpers.calculateScaleRange(
@@ -606,12 +612,21 @@
 
 		calculateXscaleRange: function () {
 
-			this.xScaleRange = this._calculateDateScaleRange(
-				this.dataRange.xmin,
-				this.dataRange.xmax,
-				this.chart.width,
-				this.fontSize
-			);
+			if (this.xScaleOverride) {
+
+				this.xScaleRange = hlp.calculateFixedScaleRange(
+					this.xScaleStartValue,
+					this.xScaleSteps,
+					this.xScaleStepWidth);
+			} else {
+
+				this.xScaleRange = this._calculateDateScaleRange(
+					this.dataRange.xmin,
+					this.dataRange.xmax,
+					this.chart.width,
+					this.fontSize
+				);
+			}
 		},
 
 		argToString: function (arg) {

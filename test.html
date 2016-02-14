@@ -53,14 +53,23 @@
 			scaleOverride: true,
 			scaleSteps: 3,
 			scaleStepWidth: 50,
-			scaleStartValue: 0
+			scaleStartValue: 0,
+
+			xScaleOverride: true,
+			xScaleSteps: 10,
+
+			// Number - The value jump in the hard coded x scale
+			xScaleStepWidth: 3600000 * 24 * 14,
+
+			// Number - The x scale starting value
+			xScaleStartValue: Date.parse("2016-02-15T03:00:00+03:00")
 		});
 
 		document.getElementById("legend").innerHTML = myChart.generateLegend();
 
 		setInterval(function () {
 
-			var arg = Date.parse("2015-04-27T04:00:00+03:00") + ii * 24 * 3600000;
+			var arg = Date.parse("2016-02-15T03:00:00+03:00") + ii * 24 * 3600000;
 
 //			myChart.datasets[0].removePoint(0);
 //			myChart.datasets[1].removePoint(0);
