@@ -733,9 +733,9 @@
 				formattedValue = +y + "",
 				formattedSize = +r + "";
 
-			point.arg = +x;
-			point.value = +y;
-			point.size = +r;  // for use in templates
+			point.arg = +x || 0;
+			point.value = +y || 0;
+			point.size = +r || 0;  // for use in templates
 
 			point.argLabel = helpers.template(this.scaleArgLabel, { value: formattedArg }),
 			point.valueLabel = helpers.template(this.scaleLabel, { value: formattedValue });

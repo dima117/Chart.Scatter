@@ -18,15 +18,15 @@
 
 		var data = [], data2 = [], ii = 0;
 
-		for (ii = 0; ii < 0; ii++) {
+		for (ii = 0; ii < 12; ii++) {
 
 			data.push({
-				x: Date.parse("2015-04-27T04:00:00+03:00") + ii * 24 * 3600000,
-				y: getRandomInt(0, 100)
+				x: Date.parse("2016-02-15T03:00:00+03:00") + ii * 24 * 3600000,
+				y: undefined //getRandomInt(0, 100)
 			});
 
 			data2.push({
-				x: Date.parse("2015-04-27T04:00:00+03:00") + ii * 24 * 3600000,
+				x: Date.parse("2016-02-15T03:00:00+03:00") + ii * 24 * 3600000,
 				y: getRandomInt(0, 100)
 			});
 		}
@@ -50,12 +50,12 @@
 			scaleType: 'date',
 			animation: false,
 
-			scaleOverride: true,
+			scaleOverride: false,
 			scaleSteps: 3,
 			scaleStepWidth: 50,
 			scaleStartValue: 0,
 
-			xScaleOverride: true,
+			xScaleOverride: false,
 			xScaleSteps: 10,
 
 			// Number - The value jump in the hard coded x scale
