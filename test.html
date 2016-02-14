@@ -18,7 +18,7 @@
 
 		var data = [], data2 = [], ii = 0;
 
-		for (ii = 0; ii < 15; ii++) {
+		for (ii = 0; ii < 0; ii++) {
 
 			data.push({
 				x: Date.parse("2015-04-27T04:00:00+03:00") + ii * 24 * 3600000,
@@ -62,14 +62,14 @@
 
 			var arg = Date.parse("2015-04-27T04:00:00+03:00") + ii * 24 * 3600000;
 
-			myChart.datasets[0].removePoint(0);
-			myChart.datasets[1].removePoint(0);
+//			myChart.datasets[0].removePoint(0);
+//			myChart.datasets[1].removePoint(0);
 
 			myChart.datasets[0].addPoint(arg, getRandomInt(0, 100));
 			myChart.datasets[1].addPoint(arg, getRandomInt(0, 100));
 			myChart.update(), ii++;
 
-		}, 200);
+		}, 1000);
 	</script>
 </body>
 </html>

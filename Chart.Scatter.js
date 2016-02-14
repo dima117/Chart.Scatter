@@ -737,7 +737,6 @@
 
 		initialize: function (datasets) {
 
-			this.hasData = false;
 			this.datasets = [];
 			this.scale = this._initScale();
 
@@ -752,8 +751,6 @@
 				var datasetObject = new chartjs.ScatterDataSet(dataset, this.options, this.chart, this.scale);
 
 				this.datasets.push(datasetObject);
-
-				this.hasData |= !!dataset.data.length;
 
 				helpers.each(dataset.data, function (dataPoint) {
 
@@ -936,6 +933,16 @@
 			helpers.each(this.datasets, callback, this);
 		},
 
+		_hasData: function() {
+			var hasData = false;
+
+			this._forEachDataset(function(dataset) {
+				hasData |= !!dataset.points.length;
+			});
+
+			return hasData;
+		},
+
 		_calculateRange: function () {
 
 			var xmin = undefined,
@@ -1062,7 +1069,7 @@
 
 		draw: function (ease) {
 
-			if (this.hasData) {
+			if (this._hasData()) {
 
 				// update view params
 				this.scale.fit();
