@@ -4,7 +4,7 @@
 	"description": "Scatter chart plugin for Chart.js",
 	"main": "Chart.Scatter.js",
 	"dependencies": {
-		"chart.js": "~1.0.2"
+		"chart.js": "1.1.1"
 	},
 	"repository": {
 		"type": "git",
@@ -20,8 +20,5 @@
 	"bugs": {
 		"url": "https://github.com/dima117/Chart.Scatter/issues"
 	},
-	"homepage": "http://dima117.github.io/Chart.Scatter",
-	"browser": {
-		"Chart": "chart.js"
-	}
+	"homepage": "http://dima117.github.io/Chart.Scatter"
 }
