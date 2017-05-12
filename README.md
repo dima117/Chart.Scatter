@@ -1,4 +1,4 @@
-#Chart.Scatter
+# Chart.Scatter
 
 *Scatter chart plugin for Chart.js* [chartjs.org](http://www.chartjs.org)
 
